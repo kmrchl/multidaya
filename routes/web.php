@@ -31,11 +31,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
-    // Profile Routes (dikomentari sementara)
-    // Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
-    // Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    // Route::get('/settings', [ProfileController::class, 'settings'])->name('settings');
-
     // Support & Reports (static pages)
     Route::view('/support', 'support.index')->name('support');
     Route::view('/reports', 'reports.index')->name('reports.index');
@@ -49,7 +44,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/', [PeminjamanController::class, 'index'])->name('index');
         Route::post('/', [PeminjamanController::class, 'store'])->name('store');
         Route::get('/{id}', [PeminjamanController::class, 'show'])->name('show');
-        Route::put('/{id}', [PeminjamanController::class, 'update'])->name('update'); // EDIT
+        Route::put('/{id}', [PeminjamanController::class, 'update'])->name('update');
         Route::put('/{id}/pengembalian', [PeminjamanController::class, 'pengembalian'])->name('pengembalian');
         Route::post('/{id}/upload-bukti', [PeminjamanController::class, 'uploadBukti'])->name('upload-bukti');
         Route::get('/{id}/invoice', [PeminjamanController::class, 'generateInvoice'])->name('invoice');
@@ -58,6 +53,10 @@ Route::middleware(['auth'])->group(function () {
         // WhatsApp Notification Routes
         Route::post('/{id}/send-pengiriman', [PeminjamanController::class, 'sendPengirimanNotification'])->name('send-pengiriman');
         Route::post('/{id}/send-pengingat', [PeminjamanController::class, 'sendPengingatPengembalian'])->name('send-pengingat');
+
+        // Customer Check Routes 
+        Route::post('/cek-pelanggan', [PeminjamanController::class, 'cekPelanggan'])->name('cek-pelanggan');
+        Route::get('/pelanggan-list', [PeminjamanController::class, 'getPelangganList'])->name('pelanggan-list');
     });
 
     // ==================== BARANG ROUTES ====================
@@ -80,7 +79,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/laporan-lab-rugi', [KeuanganController::class, 'laporanLabaRugi'])->name('laporan-lab-rugi');
     });
 
-    // ==================== API ROUTES (untuk dropdown) ====================
+    // ==================== API ROUTES ====================
     Route::get('/api/barang-tersedia', function () {
         return response()->json(
             App\Models\Barang::where('status', 'aktif')
@@ -99,4 +98,3 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/recommendations/accept', [DashboardController::class, 'acceptRecommendation'])->name('recommendations.accept');
     Route::get('/recommendations/refresh', [DashboardController::class, 'refreshRecommendations'])->name('recommendations.refresh');
 });
-
