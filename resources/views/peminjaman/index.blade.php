@@ -14,7 +14,7 @@
                     <h1 class="text-2xl sm:text-3xl font-bold text-slate-800">Peminjaman</h1>
                     <p class="text-slate-500 text-sm mt-1">Kelola data peminjaman barang</p>
                 </div>
-                <button onclick="openTambahModal()"
+                <button type="button" onclick="openTambahModal()"
                     class="bg-gray-700 hover:bg-gray-800 text-white font-semibold py-2 px-4 rounded-xl shadow-md transition flex items-center gap-2 w-full sm:w-auto justify-center">
                     <i class="fas fa-plus-circle"></i>
                     <span>Tambah Peminjaman</span>
@@ -64,6 +64,17 @@
                         <option value="date_desc">Tanggal Terbaru</option>
                     </select>
                 </div>
+                <div class="w-48">
+                    <label class="block text-sm font-semibold text-slate-700 mb-2">
+                        <i class="fas fa-users mr-2"></i>Tipe Pelanggan
+                    </label>
+                    <select id="filterPelanggan"
+                        class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500">
+                        <option value="all">Semua Pelanggan</option>
+                        <option value="new">Pelanggan Baru (≤ 1 transaksi)</option>
+                        <option value="old">Pelanggan Lama (> 1 transaksi)</option>
+                    </select>
+                </div>
             </div>
         </div>
 
@@ -92,7 +103,7 @@
                             <th class="w-28 px-3 py-3 text-right text-xs font-semibold text-slate-600 uppercase">Total</th>
                             <th class="w-20 px-3 py-3 text-center text-xs font-semibold text-slate-600 uppercase">Status
                             </th>
-                            <th class="w-44 px-3 py-3 text-center text-xs font-semibold text-slate-600 uppercase">Aksi</th>
+                            <th class="w-52 px-3 py-3 text-center text-xs font-semibold text-slate-600 uppercase">Aksi</th>
                         </tr>
                     </thead>
                     <tbody id="peminjamanTableBody">
@@ -139,7 +150,8 @@
                             id="kode_peminjaman" class="w-full px-4 py-2 border rounded-lg bg-gray-100" readonly
                             placeholder="Auto generate"></div>
                     <div><label class="block text-sm font-semibold mb-2">Nama Penyewa *</label><input type="text"
-                            name="nama_penyewa" id="nama_penyewa" required class="w-full px-4 py-2 border rounded-lg"></div>
+                            name="nama_penyewa" id="nama_penyewa" required class="w-full px-4 py-2 border rounded-lg">
+                    </div>
                     <div><label class="block text-sm font-semibold mb-2">No Telepon *</label><input type="text"
                             name="no_telepon" id="no_telepon" required class="w-full px-4 py-2 border rounded-lg"></div>
                     <div><label class="block text-sm font-semibold mb-2">Email (Opsional)</label><input type="email"
@@ -212,7 +224,7 @@
         </div>
     </div>
 
-    <!-- Modal Edit Peminjaman -->
+    <!-- Modal Edit Peminjaman dengan Form Upload Bukti Pembayaran -->
     <div id="modalEdit" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center p-4"
         onclick="if(event.target===this) closeEditModal()">
         <div class="bg-white rounded-2xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
@@ -252,6 +264,30 @@
                     <div><label class="block text-sm font-semibold mb-2">Waktu Kembali *</label><input type="time"
                             name="waktu_kembali" id="edit_waktu_kembali" required
                             class="w-full px-4 py-2 border rounded-lg"></div>
+                </div>
+
+                <!-- Form Upload Bukti Pembayaran -->
+                <div class="mb-4 border rounded-lg p-4 bg-gray-50">
+                    <label class="block text-sm font-semibold text-slate-700 mb-2">
+                        <i class="fas fa-credit-card mr-2"></i>Bukti Pembayaran
+                    </label>
+                    <div id="buktiPembayaranContainer" class="mb-2">
+                        <div id="previewBuktiPembayaran" class="hidden mb-2">
+                            <img id="previewImgBukti" class="w-32 h-32 object-cover rounded-lg border cursor-pointer"
+                                onclick="window.open(this.src, '_blank')">
+                            <button type="button" onclick="removeBuktiPembayaran()"
+                                class="text-red-500 text-sm mt-1 block">
+                                <i class="fas fa-trash"></i> Hapus Bukti
+                            </button>
+                        </div>
+                        <input type="file" id="buktiPembayaranInput" accept="image/*" class="hidden">
+                        <button type="button" onclick="document.getElementById('buktiPembayaranInput').click()"
+                            class="w-full border-2 border-dashed border-gray-400 bg-white hover:bg-gray-50 text-gray-600 py-2 rounded-lg transition flex items-center justify-center gap-2">
+                            <i class="fas fa-upload"></i> Upload Bukti Pembayaran
+                        </button>
+                    </div>
+                    <input type="hidden" id="edit_bukti_pembayaran" name="bukti_pembayaran_hidden">
+                    <p class="text-xs text-slate-500 mt-1">*Upload bukti transfer/DP (format: JPG, PNG, maks 2MB)</p>
                 </div>
 
                 <div class="mb-4">
@@ -298,7 +334,6 @@
                         class="fas fa-times text-xl"></i></button>
             </div>
             <div class="p-6">
-                <!-- Search Input -->
                 <div class="mb-4">
                     <label class="block text-sm font-semibold text-slate-700 mb-2">Cari Nama Pelanggan atau Nomor
                         Telepon</label>
@@ -313,9 +348,9 @@
                     </div>
                 </div>
 
-                <!-- Hasil Pencarian -->
                 <div id="hasilCekPelanggan" class="hidden">
                     <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                        <div id="hasilStatusInfo" class="hidden"></div>
                         <div class="flex justify-between items-start mb-3">
                             <div>
                                 <h4 class="font-bold text-slate-800 text-lg" id="hasilNama"></h4>
@@ -357,7 +392,7 @@
         </div>
     </div>
 
-    <!-- Modal Detail -->
+    <!-- Modal Detail dengan Tampilan Bukti Bayar dan Bukti Pengembalian -->
     <div id="modalDetail" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center p-4"
         onclick="if(event.target===this) closeDetailModal()">
         <div class="bg-white rounded-2xl shadow-xl max-w-3xl w-full max-h-[85vh] overflow-y-auto">
@@ -472,6 +507,30 @@
             word-break: break-word;
             line-height: 1.3;
         }
+
+        #modalTambah,
+        #modalEdit,
+        #modalDetail,
+        #modalPengembalian,
+        #modalCekPelanggan {
+            display: none;
+        }
+
+        #modalTambah.flex,
+        #modalEdit.flex,
+        #modalDetail.flex,
+        #modalPengembalian.flex,
+        #modalCekPelanggan.flex {
+            display: flex !important;
+        }
+
+        #modalTambah.hidden,
+        #modalEdit.hidden,
+        #modalDetail.hidden,
+        #modalPengembalian.hidden,
+        #modalCekPelanggan.hidden {
+            display: none !important;
+        }
     </style>
 
     <script>
@@ -486,10 +545,12 @@
         let barangList = [];
         let isLoading = false;
         let searchTimeout;
-        let currentSearchValue = '';
+        let selectedCustomer = null;
+        let currentEditId = null;
 
         // ==================== HELPER FUNCTIONS ====================
         function formatRupiah(amount) {
+            if (amount === undefined || amount === null) amount = 0;
             return new Intl.NumberFormat('id-ID', {
                 style: 'currency',
                 currency: 'IDR',
@@ -498,10 +559,12 @@
         }
 
         function formatDate(date) {
+            if (!date) return '-';
             return new Date(date).toLocaleDateString('id-ID');
         }
 
         function formatShortDate(date) {
+            if (!date) return '-';
             return new Date(date).toLocaleDateString('id-ID', {
                 day: '2-digit',
                 month: '2-digit',
@@ -511,42 +574,45 @@
 
         function escapeHtml(text) {
             if (!text) return '';
-            const div = document.createElement('div');
+            var div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
         }
 
         function getStatusBadge(status) {
-            const badges = {
+            var badges = {
                 aktif: 'status-aktif',
                 selesai: 'status-selesai',
                 terlambat: 'status-terlambat'
             };
-            const texts = {
+            var texts = {
                 aktif: '🟢 DISEWA',
                 selesai: '✅ SELESAI',
                 terlambat: '🔴 TERLAMBAT'
             };
-            return `<span class="status-badge ${badges[status] || 'status-aktif'}">${texts[status] || status}</span>`;
+            return '<span class="status-badge ' + (badges[status] || 'status-aktif') + '">' + (texts[status] || status) +
+                '</span>';
         }
 
         function showToast(msg, type) {
-            const t = document.getElementById('toast');
+            var t = document.getElementById('toast');
             if (!t) {
                 alert(msg);
                 return;
             }
             document.getElementById('toastMessage').textContent = msg;
             t.classList.remove('hidden');
-            setTimeout(() => t.classList.add('hidden'), 3000);
+            setTimeout(function() {
+                t.classList.add('hidden');
+            }, 3000);
         }
 
         // ==================== BARANG FUNCTIONS ====================
         async function loadBarang() {
             try {
-                const response = await fetch('/api/barang-tersedia');
+                var response = await fetch('/api/barang-tersedia');
                 if (!response.ok) throw new Error('Network error');
-                const result = await response.json();
+                var result = await response.json();
                 barangList = result;
                 populateBarangSelects();
                 if (barangList.length === 0) showToast('Barang tidak tersedia', 'warning');
@@ -557,74 +623,88 @@
         }
 
         function populateBarangSelects() {
-            document.querySelectorAll('.barang-select, #editBarangContainer .barang-select').forEach(select => {
-                if (!select) return;
-                const currentValue = select.value;
+            var selects = document.querySelectorAll('.barang-select, #editBarangContainer .barang-select');
+            for (var i = 0; i < selects.length; i++) {
+                var select = selects[i];
+                if (!select) continue;
+                var currentValue = select.value;
                 select.innerHTML = '<option value="">Pilih Barang</option>';
-                barangList.forEach(barang => {
+                for (var j = 0; j < barangList.length; j++) {
+                    var barang = barangList[j];
                     if (barang.tersedia > 0) {
-                        const option = document.createElement('option');
+                        var option = document.createElement('option');
                         option.value = barang.id;
-                        option.textContent =
-                            `${barang.kode_barang} - ${barang.nama_barang} (${formatRupiah(barang.harga_sewa)}) - Tersedia: ${barang.tersedia}`;
+                        option.textContent = barang.kode_barang + ' - ' + barang.nama_barang + ' (' + formatRupiah(barang
+                            .harga_sewa) + ') - Tersedia: ' + barang.tersedia;
                         select.appendChild(option);
                     }
-                });
+                }
                 if (currentValue) select.value = currentValue;
-            });
+            }
         }
 
         function addBarang() {
-            const container = document.getElementById('barangContainer');
-            const index = container.children.length;
-            const newRow = document.createElement('div');
+            var container = document.getElementById('barangContainer');
+            var index = container.children.length;
+            var newRow = document.createElement('div');
             newRow.className = 'flex gap-2 items-center barang-row';
-            newRow.innerHTML = `
-        <select name="barang[${index}][id]" class="barang-select flex-1 px-3 py-2 border rounded-lg"><option value="">Pilih Barang</option></select>
-        <input type="number" name="barang[${index}][jumlah]" placeholder="Jml" class="w-20 px-3 py-2 border rounded-lg" value="1">
-        <button type="button" onclick="removeBarang(this)" class="text-red-500"><i class="fas fa-trash"></i></button>
-    `;
+            newRow.innerHTML = '<select name="barang[' + index +
+                '][id]" class="barang-select flex-1 px-3 py-2 border rounded-lg"><option value="">Pilih Barang</option></select><input type="number" name="barang[' +
+                index +
+                '][jumlah]" placeholder="Jml" class="w-20 px-3 py-2 border rounded-lg" value="1"><button type="button" onclick="removeBarang(this)" class="text-red-500"><i class="fas fa-trash"></i></button>';
             container.appendChild(newRow);
             populateBarangSelects();
         }
 
         function removeBarang(btn) {
-            if (document.querySelectorAll('.barang-row').length > 1) btn.closest('.barang-row').remove();
+            var rows = document.querySelectorAll('.barang-row');
+            if (rows.length > 1) {
+                btn.closest('.barang-row').remove();
+            }
         }
 
         // ==================== FETCH DATA ====================
         async function fetchData() {
             if (isLoading) return;
             isLoading = true;
-            const loadingIndicator = document.getElementById('loadingIndicator');
+            var loadingIndicator = document.getElementById('loadingIndicator');
             if (loadingIndicator) loadingIndicator.classList.remove('hidden');
+
             try {
-                const params = new URLSearchParams({
+                var params = new URLSearchParams({
                     page: currentPage,
                     status: currentTab,
                     sort: currentFilters.sort,
                     search: currentFilters.search,
                     pelanggan: currentFilters.pelanggan
                 });
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 15000);
-                const response = await fetch(`/peminjaman?${params}`, {
+
+                var response = await fetch('/peminjaman?' + params.toString(), {
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    signal: controller.signal
+                    }
                 });
-                clearTimeout(timeoutId);
-                const result = await response.json();
-                renderTable(result.data);
-                renderPagination(result.pagination);
+
+                if (!response.ok) throw new Error('HTTP error! status: ' + response.status);
+
+                var result = await response.json();
+
+                if (result.data) {
+                    renderTable(result.data);
+                    if (result.pagination) {
+                        renderPagination(result.pagination);
+                    }
+                } else {
+                    document.getElementById('peminjamanTableBody').innerHTML =
+                        '<tr><td colspan="8" class="px-6 py-12 text-center text-slate-500">Belum ada data peminjaman</td></tr>';
+                }
                 updateBadges();
             } catch (error) {
-                if (error.name === 'AbortError') showToast('Request timeout, silakan coba lagi', 'error');
-                else {
-                    console.error('Error:', error);
-                    showToast('Gagal memuat data', 'error');
-                }
+                console.error('Error:', error);
+                showToast('Gagal memuat data: ' + error.message, 'error');
+                document.getElementById('peminjamanTableBody').innerHTML =
+                    '<tr><td colspan="8" class="px-6 py-12 text-center text-red-500">Error: ' + error.message +
+                    '</td></tr>';
             } finally {
                 if (loadingIndicator) loadingIndicator.classList.add('hidden');
                 isLoading = false;
@@ -633,84 +713,122 @@
 
         async function updateBadges() {
             try {
-                const aktifRes = await fetch('/peminjaman?status=aktif&per_page=1', {
+                var aktifRes = await fetch('/peminjaman?status=aktif&per_page=1', {
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest'
                     }
                 });
-                const aktifResult = await aktifRes.json();
-                const riwayatRes = await fetch('/peminjaman?status=riwayat&per_page=1', {
+                var aktifResult = await aktifRes.json();
+                var riwayatRes = await fetch('/peminjaman?status=riwayat&per_page=1', {
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest'
                     }
                 });
-                const riwayatResult = await riwayatRes.json();
-                document.getElementById('badgeAktif').textContent = aktifResult.pagination?.total || 0;
-                document.getElementById('badgeRiwayat').textContent = riwayatResult.pagination?.total || 0;
+                var riwayatResult = await riwayatRes.json();
+
+                var badgeAktif = document.getElementById('badgeAktif');
+                var badgeRiwayat = document.getElementById('badgeRiwayat');
+
+                if (badgeAktif) badgeAktif.textContent = (aktifResult.pagination && aktifResult.pagination.total) || 0;
+                if (badgeRiwayat) badgeRiwayat.textContent = (riwayatResult.pagination && riwayatResult.pagination
+                    .total) || 0;
             } catch (e) {
-                console.error(e);
+                console.error('Error updating badges:', e);
             }
         }
 
         // ==================== RENDER TABLE ====================
         function renderTable(data) {
-            const tbody = document.getElementById('peminjamanTableBody');
+            var tbody = document.getElementById('peminjamanTableBody');
             if (!tbody) return;
             if (!data || data.length === 0) {
                 tbody.innerHTML =
-                    '<tr><td colspan="8" class="px-6 py-12 text-center"><i class="fas fa-inbox text-4xl text-slate-300 mb-2 block"></i>Belum ada</td></tr>';
+                    '<tr><td colspan="8" class="px-6 py-12 text-center"><i class="fas fa-inbox text-4xl text-slate-300 mb-2 block"></i>Belum ada data</td></tr>';
                 return;
             }
-            tbody.innerHTML = data.map(item => {
-                const barangListStr = item.details?.map(d => d.nama_barang).join(', ') || '-';
-                const isAktif = item.status_pengembalian === 'aktif';
-                return `<tr class="hover:bg-gray-50 transition border-b border-slate-100">
-            <td class="px-3 py-2.5 text-xs font-mono font-semibold">${escapeHtml(item.invoice_number)}</td>
-            <td class="px-3 py-2.5 text-sm font-medium">${escapeHtml(item.nama_penyewa)}</td>
-            <td class="px-3 py-2.5 text-xs text-slate-600 barang-list max-w-[200px] truncate" title="${escapeHtml(barangListStr)}">${escapeHtml(barangListStr.substring(0, 40))}${barangListStr.length > 40 ? '...' : ''}</td>
-            <td class="px-3 py-2.5 text-xs">${formatShortDate(item.tanggal_sewa)}</td>
-            <td class="px-3 py-2.5 text-xs">${formatShortDate(item.tanggal_kembali)}</td>
-            <td class="px-3 py-2.5 text-xs font-semibold text-right">${formatRupiah(item.grand_total)}</td>
-            <td class="px-3 py-2.5 text-center">${getStatusBadge(item.status_pengembalian)}</td>
-            <td class="px-3 py-2.5 text-center">
-                <div class="flex items-center justify-center gap-1.5 flex-wrap">
-                    <button onclick="viewDetail(${item.id})" class="text-blue-600 hover:text-blue-800 p-1" title="Detail"><i class="fas fa-eye text-sm"></i></button>
-                    ${isAktif ? `<button onclick="openEditModal(${item.id})" class="text-orange-600 hover:text-orange-800 p-1" title="Edit"><i class="fas fa-edit text-sm"></i></button>` : ''}
-                    <button onclick="printInvoice(${item.id})" class="text-gray-600 hover:text-gray-800 p-1" title="Invoice"><i class="fas fa-print text-sm"></i></button>
-                    ${isAktif ? `
-                            <button onclick="openPengembalianModal(${item.id})" class="text-green-600 hover:text-green-800 p-1" title="Pengembalian"><i class="fas fa-undo-alt text-sm"></i></button>
-                            <button onclick="sendPengirimanNotif(${item.id})" class="text-purple-600 hover:text-purple-800 p-1" title="Kirim WhatsApp"><i class="fab fa-whatsapp text-sm"></i></button>
-                            <button onclick="sendPengingatNotif(${item.id})" class="text-yellow-600 hover:text-yellow-800 p-1" title="Pengingat"><i class="fas fa-bell text-sm"></i></button>
-                        ` : ''}
-                    <button onclick="deleteData(${item.id})" class="text-red-600 hover:text-red-800 p-1" title="Hapus"><i class="fas fa-trash text-sm"></i></button>
-                </div>
-            </td>
-        </tr>`;
-            }).join('');
+
+            var html = '';
+            for (var i = 0; i < data.length; i++) {
+                var item = data[i];
+                var barangListStr = '-';
+                if (item.details && item.details.length) {
+                    var barangNames = [];
+                    for (var j = 0; j < item.details.length; j++) {
+                        barangNames.push(item.details[j].nama_barang);
+                    }
+                    barangListStr = barangNames.join(', ');
+                }
+
+                var isAktif = item.status_pengembalian === 'aktif';
+                var totalTransaksi = (item.pelanggan && item.pelanggan.total_transaksi) ? item.pelanggan.total_transaksi :
+                    0;
+                var isPelangganBaru = totalTransaksi <= 1;
+                var badgePelanggan = isPelangganBaru ?
+                    '<span class="bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded-full ml-2"><i class="fas fa-star mr-1"></i>Baru</span>' :
+                    '<span class="bg-blue-100 text-blue-700 text-xs px-2 py-0.5 rounded-full ml-2"><i class="fas fa-check-circle mr-1"></i>Lama</span>';
+
+                html += '<tr class="hover:bg-gray-50 transition border-b border-slate-100">';
+                html += '<td class="px-3 py-2.5 text-xs font-mono font-semibold">' + escapeHtml(item.invoice_number) +
+                    '</td>';
+                html += '<td class="px-3 py-2.5 text-sm font-medium">' + escapeHtml(item.nama_penyewa) + badgePelanggan +
+                    '</td>';
+                html += '<td class="px-3 py-2.5 text-xs text-slate-600 barang-list max-w-[200px] truncate" title="' +
+                    escapeHtml(barangListStr) + '">' + escapeHtml(barangListStr.substring(0, 40)) + (barangListStr.length >
+                        40 ? '...' : '') + '</td>';
+                html += '<td class="px-3 py-2.5 text-xs">' + formatShortDate(item.tanggal_sewa) + '</td>';
+                html += '<td class="px-3 py-2.5 text-xs">' + formatShortDate(item.tanggal_kembali) + '</td>';
+                html += '<td class="px-3 py-2.5 text-xs font-semibold text-right">' + formatRupiah(item.grand_total) +
+                    '</td>';
+                html += '<td class="px-3 py-2.5 text-center">' + getStatusBadge(item.status_pengembalian) + '</td>';
+                html +=
+                    '<td class="px-3 py-2.5 text-center"><div class="flex items-center justify-center gap-1.5 flex-wrap">';
+                html += '<button onclick="viewDetail(' + item.id +
+                    ')" class="text-blue-600 hover:text-blue-800 p-1" title="Detail"><i class="fas fa-eye text-sm"></i></button>';
+                if (isAktif) html += '<button onclick="openEditModal(' + item.id +
+                    ')" class="text-orange-600 hover:text-orange-800 p-1" title="Edit"><i class="fas fa-edit text-sm"></i></button>';
+                html += '<button onclick="printInvoice(' + item.id +
+                    ')" class="text-gray-600 hover:text-gray-800 p-1" title="Invoice"><i class="fas fa-print text-sm"></i></button>';
+                if (isAktif) {
+                    html += '<button onclick="openPengembalianModal(' + item.id +
+                        ')" class="text-green-600 hover:text-green-800 p-1" title="Pengembalian"><i class="fas fa-undo-alt text-sm"></i></button>';
+                    html += '<button onclick="sendPengirimanNotif(' + item.id +
+                        ')" class="text-purple-600 hover:text-purple-800 p-1" title="Kirim WhatsApp"><i class="fab fa-whatsapp text-sm"></i></button>';
+                    html += '<button onclick="sendPengingatNotif(' + item.id +
+                        ')" class="text-yellow-600 hover:text-yellow-800 p-1" title="Pengingat"><i class="fas fa-bell text-sm"></i></button>';
+                }
+                html += '<button onclick="deleteData(' + item.id +
+                    ')" class="text-red-600 hover:text-red-800 p-1" title="Hapus"><i class="fas fa-trash text-sm"></i></button>';
+                html += '</div></td></tr>';
+            }
+            tbody.innerHTML = html;
         }
 
         function renderPagination(pagination) {
-            const container = document.getElementById('paginationContainer');
+            var container = document.getElementById('paginationContainer');
             if (!container) return;
             if (!pagination || pagination.last_page <= 1) {
                 container.innerHTML = '';
                 return;
             }
-            let html = '<div class="flex justify-center gap-1">';
-            const current = pagination.current_page;
-            const last = pagination.last_page;
-            let start = Math.max(1, current - 2);
-            let end = Math.min(last, current + 2);
+
+            var html = '<div class="flex justify-center gap-1">';
+            var current = pagination.current_page;
+            var last = pagination.last_page;
+            var start = Math.max(1, current - 2);
+            var end = Math.min(last, current + 2);
+
             if (start > 1) {
-                html += `<button onclick="changePage(1)" class="px-3 py-1 text-sm rounded-lg border">1</button>`;
-                if (start > 2) html += `<span class="px-2">...</span>`;
+                html += '<button onclick="changePage(1)" class="px-3 py-1 text-sm rounded-lg border">1</button>';
+                if (start > 2) html += '<span class="px-2">...</span>';
             }
-            for (let i = start; i <= end; i++) html +=
-                `<button onclick="changePage(${i})" class="px-3 py-1 text-sm rounded-lg ${i === current ? 'bg-gray-700 text-white' : 'border hover:bg-gray-100'}">${i}</button>`;
+            for (var i = start; i <= end; i++) {
+                html += '<button onclick="changePage(' + i + ')" class="px-3 py-1 text-sm rounded-lg ' + (i === current ?
+                    'bg-gray-700 text-white' : 'border hover:bg-gray-100') + '">' + i + '</button>';
+            }
             if (end < last) {
-                if (end < last - 1) html += `<span class="px-2">...</span>`;
-                html +=
-                `<button onclick="changePage(${last})" class="px-3 py-1 text-sm rounded-lg border">${last}</button>`;
+                if (end < last - 1) html += '<span class="px-2">...</span>';
+                html += '<button onclick="changePage(' + last + ')" class="px-3 py-1 text-sm rounded-lg border">' + last +
+                    '</button>';
             }
             html += '</div>';
             container.innerHTML = html;
@@ -721,46 +839,172 @@
             fetchData();
         }
 
+        // ==================== UPLOAD BUKTI PEMBAYARAN ====================
+        // Event listener untuk upload bukti pembayaran
+        document.getElementById('buktiPembayaranInput')?.addEventListener('change', async function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            if (!file.type.match('image.*')) {
+                showToast('Hanya file gambar yang diizinkan', 'error');
+                return;
+            }
+
+            if (file.size > 2 * 1024 * 1024) {
+                showToast('Ukuran file maksimal 2MB', 'error');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('bukti_pembayaran', file);
+            formData.append('_token', document.querySelector('meta[name="csrf-token"]').content);
+
+            try {
+                const response = await fetch(`/peminjaman/${currentEditId}/upload-bukti`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    showToast(result.message, 'success');
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const previewImg = document.getElementById('previewImgBukti');
+                        const previewContainer = document.getElementById('previewBuktiPembayaran');
+                        if (previewImg) previewImg.src = e.target.result;
+                        if (previewContainer) previewContainer.classList.remove('hidden');
+                    };
+                    reader.readAsDataURL(file);
+                    document.getElementById('edit_bukti_pembayaran').value = result.bukti_pembayaran_url;
+                } else {
+                    showToast(result.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Gagal upload bukti pembayaran', 'error');
+            }
+        });
+
+        function removeBuktiPembayaran() {
+            document.getElementById('previewBuktiPembayaran').classList.add('hidden');
+            document.getElementById('previewImgBukti').src = '';
+            document.getElementById('buktiPembayaranInput').value = '';
+            document.getElementById('edit_bukti_pembayaran').value = '';
+            showToast('Bukti pembayaran akan dihapus saat menyimpan', 'info');
+        }
+
         // ==================== CRUD FUNCTIONS ====================
         function openTambahModal() {
-            document.getElementById('modalTambah').classList.remove('hidden');
-            document.getElementById('modalTambah').classList.add('flex');
+            console.log('openTambahModal dipanggil');
+            var modal = document.getElementById('modalTambah');
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                console.log('Modal dibuka');
+            } else {
+                console.error('Modal tidak ditemukan!');
+                alert('Error: Modal tidak ditemukan');
+            }
         }
 
         function closeTambahModal() {
-            document.getElementById('modalTambah').classList.add('hidden');
-            document.getElementById('modalTambah').classList.remove('flex');
-            document.getElementById('formPeminjaman')?.reset();
+            var modal = document.getElementById('modalTambah');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                var form = document.getElementById('formPeminjaman');
+                if (form) form.reset();
+            }
         }
 
         function printInvoice(id) {
-            window.open(`/peminjaman/${id}/invoice`, '_blank');
+            window.open('/peminjaman/' + id + '/invoice', '_blank');
         }
 
         async function viewDetail(id) {
             try {
-                const response = await fetch(`/peminjaman/${id}`);
-                const result = await response.json();
+                var response = await fetch('/peminjaman/' + id);
+                var result = await response.json();
                 if (result.success) {
-                    const data = result.data;
-                    const detailsHtml = data.details.map(d =>
-                        `<tr class="border-b"><td class="py-1.5 text-sm">${escapeHtml(d.nama_barang)}</td><td class="py-1.5 text-center text-sm">${d.jumlah}</td><td class="py-1.5 text-right text-sm">${formatRupiah(d.harga_sewa)}</td><td class="py-1.5 text-right text-sm font-semibold">${formatRupiah(d.subtotal)}</td></tr>`
-                        ).join('');
+                    var data = result.data;
+                    var detailsHtml = '';
+                    for (var i = 0; i < data.details.length; i++) {
+                        var d = data.details[i];
+                        detailsHtml += '<tr class="border-b"><td class="py-1.5 text-sm">' + escapeHtml(d.nama_barang) +
+                            '</td><td class="py-1.5 text-center text-sm">' + d.jumlah +
+                            '</td><td class="py-1.5 text-right text-sm">' + formatRupiah(d.harga_sewa) +
+                            '</td><td class="py-1.5 text-right text-sm font-semibold">' + formatRupiah(d.subtotal) +
+                            '</td></tr>';
+                    }
+
+                    // HTML untuk bukti pembayaran
+                    var buktiPembayaranHtml = '';
+                    if (data.bukti_pembayaran) {
+                        buktiPembayaranHtml = `
+                            <div class="mb-4">
+                                <p class="font-semibold text-sm mb-2">Bukti Pembayaran:</p>
+                                <img src="/storage/${data.bukti_pembayaran}" class="w-48 h-48 object-cover rounded-lg border cursor-pointer" onclick="window.open('/storage/${data.bukti_pembayaran}', '_blank')">
+                            </div>
+                        `;
+                    }
+
+                    // HTML untuk bukti pengembalian
+                    var buktiPengembalianHtml = '';
+                    if (data.foto_pengembalian) {
+                        buktiPengembalianHtml = `
+                            <div class="mb-4">
+                                <p class="font-semibold text-sm mb-2">Dokumentasi Pengembalian:</p>
+                                <img src="/storage/${data.foto_pengembalian}" class="w-48 h-48 object-cover rounded-lg border cursor-pointer" onclick="window.open('/storage/${data.foto_pengembalian}', '_blank')">
+                            </div>
+                        `;
+                    }
+
+                    // HTML informasi pengembalian jika sudah selesai
+                    var infoPengembalianHtml = '';
+                    if (data.status_pengembalian === 'selesai') {
+                        infoPengembalianHtml = `
+                            <div class="mt-4 p-3 bg-gray-50 rounded-lg">
+                                <h4 class="font-semibold text-sm mb-2">Informasi Pengembalian:</h4>
+                                <p class="text-sm">Tanggal Kembali Real: ${formatDate(data.tanggal_pengembalian_real) || '-'}</p>
+                                <p class="text-sm">Kondisi Barang: ${data.kondisi_barang || '-'}</p>
+                                ${data.kerusakan ? `<p class="text-sm">Kerusakan: ${data.kerusakan}</p>` : ''}
+                                ${data.denda > 0 ? `<p class="text-sm">Denda: ${formatRupiah(data.denda)}</p>` : ''}
+                                ${data.catatan_pengembalian ? `<p class="text-sm">Catatan: ${data.catatan_pengembalian}</p>` : ''}
+                            </div>
+                        `;
+                    }
+
                     document.getElementById('detailContent').innerHTML = `
-                <div class="grid grid-cols-3 gap-3 mb-4 pb-3 border-b">
-                    <div><p class="text-xs text-slate-500">Invoice</p><p class="font-mono font-semibold text-sm">${data.invoice_number}</p></div>
-                    <div><p class="text-xs text-slate-500">Status</p>${getStatusBadge(data.status_pengembalian)}</div>
-                    <div><p class="text-xs text-slate-500">Penyewa</p><p class="font-semibold text-sm">${escapeHtml(data.nama_penyewa)}</p></div>
-                    <div><p class="text-xs text-slate-500">Telepon</p><p class="text-sm">${escapeHtml(data.no_telepon)}</p></div>
-                    <div><p class="text-xs text-slate-500">Tanggal Sewa</p><p class="text-sm">${formatDate(data.tanggal_sewa)} | ${data.waktu_sewa}</p></div>
-                    <div><p class="text-xs text-slate-500">Tanggal Kembali</p><p class="text-sm">${formatDate(data.tanggal_kembali)} | ${data.waktu_kembali}</p></div>
-                </div>
-                <div class="mb-3"><p class="font-semibold text-sm mb-2">Detail Barang</p><div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="bg-gray-50"><th class="px-2 py-1 text-left">Barang</th><th class="px-2 py-1 text-center w-16">Jml</th><th class="px-2 py-1 text-right w-28">Harga</th><th class="px-2 py-1 text-right w-28">Subtotal</th></tr></thead><tbody>${detailsHtml}</tbody><tfoot><tr class="border-t"><td colspan="3" class="px-2 py-2 text-right font-bold">TOTAL</td><td class="px-2 py-2 text-right font-bold">${formatRupiah(data.grand_total)}</td></tr></tfoot></table></div></div>
-            `;
+                        <div class="grid grid-cols-2 gap-3 mb-4 pb-3 border-b">
+                            <div><p class="text-xs text-slate-500">Invoice</p><p class="font-mono font-semibold text-sm">${data.invoice_number}</p></div>
+                            <div><p class="text-xs text-slate-500">Status</p>${getStatusBadge(data.status_pengembalian)}</div>
+                            <div><p class="text-xs text-slate-500">Penyewa</p><p class="font-semibold text-sm">${escapeHtml(data.nama_penyewa)}</p></div>
+                            <div><p class="text-xs text-slate-500">Telepon</p><p class="text-sm">${escapeHtml(data.no_telepon)}</p></div>
+                            <div><p class="text-xs text-slate-500">Tanggal Sewa</p><p class="text-sm">${formatDate(data.tanggal_sewa)} | ${data.waktu_sewa}</p></div>
+                            <div><p class="text-xs text-slate-500">Tanggal Kembali</p><p class="text-sm">${formatDate(data.tanggal_kembali)} | ${data.waktu_kembali}</p></div>
+                            <div><p class="text-xs text-slate-500">Status Pembayaran</p><p class="text-sm">${data.status_pembayaran || '-'}</p></div>
+                            <div><p class="text-xs text-slate-500">Total</p><p class="text-sm font-bold">${formatRupiah(data.grand_total)}</p></div>
+                        </div>
+                        ${buktiPembayaranHtml}
+                        <div class="mb-3">
+                            <p class="font-semibold text-sm mb-2">Detail Barang:</p>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-sm">
+                                    <thead><tr class="bg-gray-50"><th class="px-2 py-1 text-left">Barang</th><th class="px-2 py-1 text-center w-16">Jml</th><th class="px-2 py-1 text-right w-28">Harga</th><th class="px-2 py-1 text-right w-28">Subtotal</th></tr></thead>
+                                    <tbody>${detailsHtml}</tbody>
+                                    <tfoot><tr class="border-t"><td colspan="3" class="px-2 py-2 text-right font-bold">TOTAL</td><td class="px-2 py-2 text-right font-bold">${formatRupiah(data.grand_total)}</td></tr></tfoot>
+                                </table>
+                            </div>
+                        </div>
+                        ${buktiPengembalianHtml}
+                        ${infoPengembalianHtml}
+                    `;
                     document.getElementById('modalDetail').classList.remove('hidden');
                     document.getElementById('modalDetail').classList.add('flex');
                 }
             } catch (error) {
+                console.error('Error:', error);
                 showToast('Gagal mengambil detail', 'error');
             }
         }
@@ -773,14 +1017,14 @@
         async function deleteData(id) {
             if (confirm('Yakin ingin menghapus peminjaman ini?')) {
                 try {
-                    const response = await fetch(`/peminjaman/${id}`, {
+                    var response = await fetch('/peminjaman/' + id, {
                         method: 'DELETE',
                         headers: {
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
                             'Accept': 'application/json'
                         }
                     });
-                    const result = await response.json();
+                    var result = await response.json();
                     if (result.success) {
                         showToast(result.message, 'success');
                         fetchData();
@@ -795,29 +1039,56 @@
 
         // ==================== EDIT FUNCTIONS ====================
         async function openEditModal(id) {
+            currentEditId = id;
             try {
-                const response = await fetch(`/peminjaman/${id}`);
-                const result = await response.json();
+                var response = await fetch('/peminjaman/' + id);
+                var result = await response.json();
                 if (result.success) {
-                    const data = result.data;
+                    var data = result.data;
                     document.getElementById('edit_id').value = data.id;
                     document.getElementById('edit_invoice_number').value = data.invoice_number;
                     document.getElementById('edit_nama_penyewa').value = data.nama_penyewa;
                     document.getElementById('edit_no_telepon').value = data.no_telepon;
                     document.getElementById('edit_nama_acara').value = data.nama_acara || '';
                     document.getElementById('edit_lokasi_acara').value = data.lokasi_acara || '';
-                    document.getElementById('edit_tanggal_sewa').value = data.tanggal_sewa;
-                    document.getElementById('edit_tanggal_kembali').value = data.tanggal_kembali;
-                    document.getElementById('edit_waktu_sewa').value = data.waktu_sewa;
-                    document.getElementById('edit_waktu_kembali').value = data.waktu_kembali;
-                    document.getElementById('edit_diskon').value = data.diskon;
-                    document.getElementById('edit_status_pembayaran').value = data.status_pembayaran;
+
+                    // Format tanggal dengan benar
+                    if (data.tanggal_sewa) {
+                        var tglSewa = new Date(data.tanggal_sewa);
+                        document.getElementById('edit_tanggal_sewa').value = tglSewa.toISOString().split('T')[0];
+                    }
+                    if (data.tanggal_kembali) {
+                        var tglKembali = new Date(data.tanggal_kembali);
+                        document.getElementById('edit_tanggal_kembali').value = tglKembali.toISOString().split('T')[0];
+                    }
+
+                    document.getElementById('edit_waktu_sewa').value = data.waktu_sewa || '';
+                    document.getElementById('edit_waktu_kembali').value = data.waktu_kembali || '';
+                    document.getElementById('edit_diskon').value = data.diskon || 0;
+                    document.getElementById('edit_status_pembayaran').value = data.status_pembayaran || 'belum_bayar';
                     document.getElementById('edit_keterangan').value = data.keterangan || '';
-                    const container = document.getElementById('editBarangContainer');
+
+                    // Tampilkan bukti pembayaran jika ada
+                    if (data.bukti_pembayaran) {
+                        var previewImg = document.getElementById('previewImgBukti');
+                        var previewContainer = document.getElementById('previewBuktiPembayaran');
+                        if (previewImg) previewImg.src = '/storage/' + data.bukti_pembayaran;
+                        if (previewContainer) previewContainer.classList.remove('hidden');
+                        document.getElementById('edit_bukti_pembayaran').value = data.bukti_pembayaran;
+                    } else {
+                        document.getElementById('previewBuktiPembayaran').classList.add('hidden');
+                        document.getElementById('edit_bukti_pembayaran').value = '';
+                    }
+
+                    var container = document.getElementById('editBarangContainer');
                     container.innerHTML = '';
-                    data.details.forEach((detail) => {
-                        addEditBarangRow(detail.barang_id, detail.jumlah);
-                    });
+                    if (data.details && data.details.length) {
+                        for (var i = 0; i < data.details.length; i++) {
+                            addEditBarangRow(data.details[i].barang_id, data.details[i].jumlah);
+                        }
+                    } else {
+                        addEditBarangRow(null, 1);
+                    }
                     document.getElementById('modalEdit').classList.remove('hidden');
                     document.getElementById('modalEdit').classList.add('flex');
                 }
@@ -830,86 +1101,103 @@
         function closeEditModal() {
             document.getElementById('modalEdit').classList.add('hidden');
             document.getElementById('modalEdit').classList.remove('flex');
+            // Reset bukti pembayaran form
+            document.getElementById('previewBuktiPembayaran').classList.add('hidden');
+            document.getElementById('buktiPembayaranInput').value = '';
         }
 
         function addEditBarang() {
             addEditBarangRow(null, 1);
         }
 
-        function addEditBarangRow(selectedId = null, jumlah = 1) {
-            const container = document.getElementById('editBarangContainer');
-            const index = container.children.length;
-            const newRow = document.createElement('div');
+        function addEditBarangRow(selectedId, jumlah) {
+            if (jumlah === undefined) jumlah = 1;
+            var container = document.getElementById('editBarangContainer');
+            var index = container.children.length;
+            var newRow = document.createElement('div');
             newRow.className = 'flex gap-2 items-center barang-row mb-2';
-            newRow.innerHTML =
-                `<select name="barang[${index}][id]" class="barang-select flex-1 px-3 py-2 border rounded-lg"><option value="">Pilih Barang</option></select><input type="number" name="barang[${index}][jumlah]" placeholder="Jml" class="w-20 px-3 py-2 border rounded-lg" value="${jumlah}"><button type="button" onclick="removeEditBarang(this)" class="text-red-500 hover:text-red-700"><i class="fas fa-trash"></i></button>`;
+            newRow.innerHTML = '<select name="barang[' + index +
+                '][id]" class="barang-select flex-1 px-3 py-2 border rounded-lg"><option value="">Pilih Barang</option></select><input type="number" name="barang[' +
+                index + '][jumlah]" placeholder="Jml" class="w-20 px-3 py-2 border rounded-lg" value="' + jumlah +
+                '"><button type="button" onclick="removeEditBarang(this)" class="text-red-500 hover:text-red-700"><i class="fas fa-trash"></i></button>';
             container.appendChild(newRow);
             populateBarangSelects();
             if (selectedId) {
-                const select = newRow.querySelector('.barang-select');
-                select.value = selectedId;
+                var select = newRow.querySelector('.barang-select');
+                if (select) select.value = selectedId;
             }
         }
 
         function removeEditBarang(btn) {
-            if (document.querySelectorAll('#editBarangContainer .barang-row').length > 1) btn.closest('.barang-row')
-            .remove();
-            else showToast('Minimal harus ada satu barang', 'warning');
+            var rows = document.querySelectorAll('#editBarangContainer .barang-row');
+            if (rows.length > 1) {
+                btn.closest('.barang-row').remove();
+            } else {
+                showToast('Minimal harus ada satu barang', 'warning');
+            }
         }
 
-        document.getElementById('formEditPeminjaman')?.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const id = document.getElementById('edit_id').value;
-            const barang = [];
-            document.querySelectorAll('#editBarangContainer .barang-row').forEach((row) => {
-                const barangId = row.querySelector('[name*="[id]"]')?.value;
-                const jumlah = row.querySelector('[name*="[jumlah]"]')?.value;
-                if (barangId && jumlah) barang.push({
-                    id: parseInt(barangId),
-                    jumlah: parseInt(jumlah)
-                });
-            });
-            if (barang.length === 0) {
-                showToast('Pilih minimal satu barang', 'error');
-                return;
-            }
-            const data = {
-                nama_penyewa: document.getElementById('edit_nama_penyewa').value,
-                no_telepon: document.getElementById('edit_no_telepon').value,
-                customer_whatsapp: document.getElementById('edit_no_telepon').value,
-                nama_acara: document.getElementById('edit_nama_acara').value,
-                lokasi_acara: document.getElementById('edit_lokasi_acara').value,
-                tanggal_sewa: document.getElementById('edit_tanggal_sewa').value,
-                tanggal_kembali: document.getElementById('edit_tanggal_kembali').value,
-                waktu_sewa: document.getElementById('edit_waktu_sewa').value,
-                waktu_kembali: document.getElementById('edit_waktu_kembali').value,
-                diskon: document.getElementById('edit_diskon').value,
-                status_pembayaran: document.getElementById('edit_status_pembayaran').value,
-                keterangan: document.getElementById('edit_keterangan').value,
-                barang: barang
-            };
-            try {
-                const response = await fetch(`/peminjaman/${id}`, {
-                    method: 'PUT',
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(data)
-                });
-                const result = await response.json();
-                if (result.success) {
-                    showToast(result.message, 'success');
-                    closeEditModal();
-                    fetchData();
-                } else {
-                    showToast(result.message, 'error');
+        // Form Edit Submission
+        var editForm = document.getElementById('formEditPeminjaman');
+        if (editForm) {
+            editForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                var id = document.getElementById('edit_id').value;
+                var barang = [];
+                var rows = document.querySelectorAll('#editBarangContainer .barang-row');
+                for (var i = 0; i < rows.length; i++) {
+                    var row = rows[i];
+                    var barangId = row.querySelector('[name*="[id]"]') ? row.querySelector('[name*="[id]"]')
+                        .value : null;
+                    var jumlah = row.querySelector('[name*="[jumlah]"]') ? row.querySelector(
+                        '[name*="[jumlah]"]').value : null;
+                    if (barangId && jumlah) barang.push({
+                        id: parseInt(barangId),
+                        jumlah: parseInt(jumlah)
+                    });
                 }
-            } catch (error) {
-                console.error('Error:', error);
-                showToast('Gagal mengupdate data', 'error');
-            }
-        });
+                if (barang.length === 0) {
+                    showToast('Pilih minimal satu barang', 'error');
+                    return;
+                }
+                var data = {
+                    nama_penyewa: document.getElementById('edit_nama_penyewa').value,
+                    no_telepon: document.getElementById('edit_no_telepon').value,
+                    customer_whatsapp: document.getElementById('edit_no_telepon').value,
+                    nama_acara: document.getElementById('edit_nama_acara').value,
+                    lokasi_acara: document.getElementById('edit_lokasi_acara').value,
+                    tanggal_sewa: document.getElementById('edit_tanggal_sewa').value,
+                    tanggal_kembali: document.getElementById('edit_tanggal_kembali').value,
+                    waktu_sewa: document.getElementById('edit_waktu_sewa').value,
+                    waktu_kembali: document.getElementById('edit_waktu_kembali').value,
+                    diskon: document.getElementById('edit_diskon').value,
+                    status_pembayaran: document.getElementById('edit_status_pembayaran').value,
+                    keterangan: document.getElementById('edit_keterangan').value,
+                    barang: barang
+                };
+                try {
+                    var response = await fetch('/peminjaman/' + id, {
+                        method: 'PUT',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(data)
+                    });
+                    var result = await response.json();
+                    if (result.success) {
+                        showToast(result.message, 'success');
+                        closeEditModal();
+                        fetchData();
+                    } else {
+                        showToast(result.message, 'error');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    showToast('Gagal mengupdate data', 'error');
+                }
+            });
+        }
 
         // ==================== PENGEMBALIAN FUNCTIONS ====================
         function openPengembalianModal(id) {
@@ -926,7 +1214,8 @@
         }
 
         function resetPengembalianForm() {
-            document.getElementById('formPengembalian').reset();
+            var form = document.getElementById('formPengembalian');
+            if (form) form.reset();
             document.getElementById('kerusakanSection').classList.add('hidden');
             document.getElementById('dendaSection').classList.add('hidden');
             document.getElementById('previewPengembalian').classList.add('hidden');
@@ -934,7 +1223,7 @@
         }
 
         function toggleKerusakan() {
-            const kondisi = document.getElementById('kondisiBarang').value;
+            var kondisi = document.getElementById('kondisiBarang').value;
             if (kondisi === 'rusak') {
                 document.getElementById('kerusakanSection').classList.remove('hidden');
                 document.getElementById('dendaSection').classList.remove('hidden');
@@ -946,43 +1235,47 @@
                 document.getElementById('dendaSection').classList.add('hidden');
             }
         }
-        document.getElementById('formPengembalian')?.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const id = document.getElementById('pengembalianId').value;
-            const formData = new FormData(e.target);
-            try {
-                const response = await fetch(`/peminjaman/${id}/pengembalian`, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                    },
-                    body: formData
-                });
-                const result = await response.json();
-                if (result.success) {
-                    showToast(result.message, 'success');
-                    closePengembalianModal();
-                    fetchData();
-                } else {
-                    showToast(result.message, 'error');
+
+        var pengembalianForm = document.getElementById('formPengembalian');
+        if (pengembalianForm) {
+            pengembalianForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                var id = document.getElementById('pengembalianId').value;
+                var formData = new FormData(e.target);
+                try {
+                    var response = await fetch('/peminjaman/' + id + '/pengembalian', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                        },
+                        body: formData
+                    });
+                    var result = await response.json();
+                    if (result.success) {
+                        showToast(result.message, 'success');
+                        closePengembalianModal();
+                        fetchData();
+                    } else {
+                        showToast(result.message, 'error');
+                    }
+                } catch (error) {
+                    showToast('Gagal memproses', 'error');
                 }
-            } catch (error) {
-                showToast('Gagal memproses', 'error');
-            }
-        });
+            });
+        }
 
         // ==================== WHATSAPP FUNCTIONS ====================
         async function sendPengirimanNotif(id) {
             if (confirm('Kirim notifikasi pengiriman ke pelanggan?')) {
                 try {
-                    const response = await fetch(`/peminjaman/${id}/send-pengiriman`, {
+                    var response = await fetch('/peminjaman/' + id + '/send-pengiriman', {
                         method: 'POST',
                         headers: {
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
                             'Accept': 'application/json'
                         }
                     });
-                    const result = await response.json();
+                    var result = await response.json();
                     if (result.success) showToast(result.message, 'success');
                     else showToast(result.message, 'error');
                 } catch (error) {
@@ -991,17 +1284,18 @@
                 }
             }
         }
+
         async function sendPengingatNotif(id) {
             if (confirm('Kirim pengingat pengembalian ke pelanggan?')) {
                 try {
-                    const response = await fetch(`/peminjaman/${id}/send-pengingat`, {
+                    var response = await fetch('/peminjaman/' + id + '/send-pengingat', {
                         method: 'POST',
                         headers: {
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
                             'Accept': 'application/json'
                         }
                     });
-                    const result = await response.json();
+                    var result = await response.json();
                     if (result.success) showToast(result.message, 'success');
                     else showToast(result.message, 'error');
                 } catch (error) {
@@ -1012,124 +1306,158 @@
         }
 
         // ==================== FORM SUBMISSIONS ====================
-        document.getElementById('formPeminjaman')?.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-            const data = {
-                nama_penyewa: formData.get('nama_penyewa'),
-                no_telepon: formData.get('no_telepon'),
-                customer_whatsapp: formData.get('no_telepon'),
-                email: formData.get('email'),
-                alamat: formData.get('alamat'),
-                tipe_pelanggan: formData.get('tipe_pelanggan'),
-                nama_acara: formData.get('nama_acara'),
-                lokasi_acara: formData.get('lokasi_acara'),
-                tanggal_sewa: formData.get('tanggal_sewa'),
-                tanggal_kembali: formData.get('tanggal_kembali'),
-                waktu_sewa: formData.get('waktu_sewa'),
-                waktu_kembali: formData.get('waktu_kembali'),
-                diskon: formData.get('diskon'),
-                status_pembayaran: formData.get('status_pembayaran'),
-                keterangan: formData.get('keterangan'),
-                pelanggan_id: formData.get('pelanggan_id'),
-                barang: []
-            };
-            document.querySelectorAll('#barangContainer .barang-row').forEach(row => {
-                const id = row.querySelector('[name*="[id]"]')?.value;
-                const jumlah = row.querySelector('[name*="[jumlah]"]')?.value;
-                if (id && jumlah) data.barang.push({
-                    id: parseInt(id),
-                    jumlah: parseInt(jumlah)
-                });
-            });
-            if (data.barang.length === 0) {
-                showToast('Pilih minimal satu barang', 'error');
-                return;
-            }
-            try {
-                const response = await fetch('/peminjaman', {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(data)
-                });
-                const result = await response.json();
-                if (result.success) {
-                    showToast(result.message, 'success');
-                    closeTambahModal();
-                    fetchData();
-                } else {
-                    showToast(result.message, 'error');
+        var peminjamanForm = document.getElementById('formPeminjaman');
+        if (peminjamanForm) {
+            peminjamanForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                var formData = new FormData(e.target);
+                var data = {
+                    nama_penyewa: formData.get('nama_penyewa'),
+                    no_telepon: formData.get('no_telepon'),
+                    customer_whatsapp: formData.get('no_telepon'),
+                    email: formData.get('email'),
+                    alamat: formData.get('alamat'),
+                    tipe_pelanggan: formData.get('tipe_pelanggan'),
+                    nama_acara: formData.get('nama_acara'),
+                    lokasi_acara: formData.get('lokasi_acara'),
+                    tanggal_sewa: formData.get('tanggal_sewa'),
+                    tanggal_kembali: formData.get('tanggal_kembali'),
+                    waktu_sewa: formData.get('waktu_sewa'),
+                    waktu_kembali: formData.get('waktu_kembali'),
+                    diskon: formData.get('diskon'),
+                    status_pembayaran: formData.get('status_pembayaran'),
+                    keterangan: formData.get('keterangan'),
+                    pelanggan_id: formData.get('pelanggan_id'),
+                    barang: []
+                };
+                var rows = document.querySelectorAll('#barangContainer .barang-row');
+                for (var i = 0; i < rows.length; i++) {
+                    var row = rows[i];
+                    var id = row.querySelector('[name*="[id]"]') ? row.querySelector('[name*="[id]"]').value :
+                        null;
+                    var jumlah = row.querySelector('[name*="[jumlah]"]') ? row.querySelector(
+                        '[name*="[jumlah]"]').value : null;
+                    if (id && jumlah) data.barang.push({
+                        id: parseInt(id),
+                        jumlah: parseInt(jumlah)
+                    });
                 }
-            } catch (error) {
-                showToast('Gagal menyimpan', 'error');
-            }
-        });
+                if (data.barang.length === 0) {
+                    showToast('Pilih minimal satu barang', 'error');
+                    return;
+                }
+                try {
+                    var response = await fetch('/peminjaman', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(data)
+                    });
+                    var result = await response.json();
+                    if (result.success) {
+                        showToast(result.message, 'success');
+                        closeTambahModal();
+                        fetchData();
+                    } else {
+                        showToast(result.message, 'error');
+                    }
+                } catch (error) {
+                    showToast('Gagal menyimpan', 'error');
+                }
+            });
+        }
 
         // ==================== EVENT LISTENERS ====================
-        document.getElementById('filterSort')?.addEventListener('change', (e) => {
-            currentFilters.sort = e.target.value;
-            currentPage = 1;
-            fetchData();
-        });
-        document.getElementById('searchInput')?.addEventListener('input', (e) => {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => {
-                currentFilters.search = e.target.value;
+        var filterSort = document.getElementById('filterSort');
+        if (filterSort) {
+            filterSort.addEventListener('change', function(e) {
+                currentFilters.sort = e.target.value;
                 currentPage = 1;
                 fetchData();
-            }, 500);
-        });
+            });
+        }
+
+        var filterPelanggan = document.getElementById('filterPelanggan');
+        if (filterPelanggan) {
+            filterPelanggan.addEventListener('change', function(e) {
+                currentFilters.pelanggan = e.target.value;
+                currentPage = 1;
+                fetchData();
+            });
+        }
+
+        var searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            searchInput.addEventListener('input', function(e) {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(function() {
+                    currentFilters.search = e.target.value;
+                    currentPage = 1;
+                    fetchData();
+                }, 500);
+            });
+        }
 
         function switchTab(tab) {
             currentTab = tab;
             currentPage = 1;
-            const aktifBtn = document.getElementById('tabAktifBtn');
-            const riwayatBtn = document.getElementById('tabRiwayatBtn');
+            var aktifBtn = document.getElementById('tabAktifBtn');
+            var riwayatBtn = document.getElementById('tabRiwayatBtn');
             if (tab === 'aktif') {
-                aktifBtn?.classList.add('border-gray-700', 'text-gray-700');
-                aktifBtn?.classList.remove('border-transparent', 'text-slate-500');
-                riwayatBtn?.classList.remove('border-gray-700', 'text-gray-700');
-                riwayatBtn?.classList.add('border-transparent', 'text-slate-500');
+                if (aktifBtn) {
+                    aktifBtn.classList.add('border-gray-700', 'text-gray-700');
+                    aktifBtn.classList.remove('border-transparent', 'text-slate-500');
+                }
+                if (riwayatBtn) {
+                    riwayatBtn.classList.remove('border-gray-700', 'text-gray-700');
+                    riwayatBtn.classList.add('border-transparent', 'text-slate-500');
+                }
             } else {
-                riwayatBtn?.classList.add('border-gray-700', 'text-gray-700');
-                riwayatBtn?.classList.remove('border-transparent', 'text-slate-500');
-                aktifBtn?.classList.remove('border-gray-700', 'text-gray-700');
-                aktifBtn?.classList.add('border-transparent', 'text-slate-500');
+                if (riwayatBtn) {
+                    riwayatBtn.classList.add('border-gray-700', 'text-gray-700');
+                    riwayatBtn.classList.remove('border-transparent', 'text-slate-500');
+                }
+                if (aktifBtn) {
+                    aktifBtn.classList.remove('border-gray-700', 'text-gray-700');
+                    aktifBtn.classList.add('border-transparent', 'text-slate-500');
+                }
             }
             fetchData();
         }
 
         // ==================== DROPZONE FUNCTIONS ====================
-        const dropzone = document.getElementById('dropzonePengembalian');
-        const fileInput = document.getElementById('fotoPengembalian');
-        const preview = document.getElementById('previewPengembalian');
-        const previewImg = document.getElementById('previewImgPengembalian');
+        var dropzone = document.getElementById('dropzonePengembalian');
+        var fileInput = document.getElementById('fotoPengembalian');
+        var preview = document.getElementById('previewPengembalian');
+        var previewImg = document.getElementById('previewImgPengembalian');
+
         if (dropzone && fileInput) {
-            dropzone.addEventListener('click', () => fileInput.click());
-            dropzone.addEventListener('dragover', (e) => {
+            dropzone.addEventListener('click', function() {
+                fileInput.click();
+            });
+            dropzone.addEventListener('dragover', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
                 dropzone.classList.add('border-gray-500', 'bg-gray-50');
             });
-            dropzone.addEventListener('dragleave', (e) => {
+            dropzone.addEventListener('dragleave', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
                 dropzone.classList.remove('border-gray-500', 'bg-gray-50');
             });
-            dropzone.addEventListener('drop', (e) => {
+            dropzone.addEventListener('drop', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
                 dropzone.classList.remove('border-gray-500', 'bg-gray-50');
-                const files = e.dataTransfer.files;
+                var files = e.dataTransfer.files;
                 if (files && files.length > 0) {
-                    const file = files[0];
-                    const dataTransfer = new DataTransfer();
+                    var file = files[0];
+                    var dataTransfer = new DataTransfer();
                     dataTransfer.items.add(file);
                     fileInput.files = dataTransfer.files;
-                    const changeEvent = new Event('change', {
+                    var changeEvent = new Event('change', {
                         bubbles: true
                     });
                     fileInput.dispatchEvent(changeEvent);
@@ -1137,19 +1465,23 @@
                 }
             });
         }
-        fileInput?.addEventListener('change', (e) => {
-            if (e.target.files && e.target.files.length > 0) previewImage(e.target.files[0]);
-            else {
-                preview?.classList.add('hidden');
-                dropzone?.classList.remove('hidden');
-                if (previewImg) previewImg.src = '';
-            }
-        });
+
+        if (fileInput) {
+            fileInput.addEventListener('change', function(e) {
+                if (e.target.files && e.target.files.length > 0) {
+                    previewImage(e.target.files[0]);
+                } else {
+                    if (preview) preview.classList.add('hidden');
+                    if (dropzone) dropzone.classList.remove('hidden');
+                    if (previewImg) previewImg.src = '';
+                }
+            });
+        }
 
         function previewImage(file) {
             if (!file) return;
-            const reader = new FileReader();
-            reader.onload = (e) => {
+            var reader = new FileReader();
+            reader.onload = function(e) {
                 if (previewImg) previewImg.src = e.target.result;
                 if (preview) preview.classList.remove('hidden');
                 if (dropzone) dropzone.classList.add('hidden');
@@ -1169,37 +1501,54 @@
             document.getElementById('hasilCekPelanggan').classList.add('hidden');
             document.getElementById('pelangganNotFound').classList.add('hidden');
             document.getElementById('autocompleteDropdown').classList.add('hidden');
+            var statusInfo = document.getElementById('hasilStatusInfo');
+            if (statusInfo) statusInfo.classList.add('hidden');
         }
 
         function closeCekPelangganModal() {
             document.getElementById('modalCekPelanggan').classList.add('hidden');
             document.getElementById('modalCekPelanggan').classList.remove('flex');
         }
-        document.getElementById('searchPelanggan')?.addEventListener('input', function(e) {
-            const keyword = e.target.value;
-            clearTimeout(searchTimeout);
-            if (keyword.length < 2) {
-                document.getElementById('autocompleteDropdown').classList.add('hidden');
-                return;
-            }
-            searchTimeout = setTimeout(() => searchPelangganAutocomplete(keyword), 300);
-        });
-        document.getElementById('searchPelanggan')?.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                const keyword = this.value;
-                if (keyword.length >= 2) searchPelanggan(keyword);
-            }
-        });
+
+        var searchPelangganInput = document.getElementById('searchPelanggan');
+        if (searchPelangganInput) {
+            searchPelangganInput.addEventListener('input', function(e) {
+                var keyword = e.target.value;
+                clearTimeout(searchTimeout);
+                if (keyword.length < 2) {
+                    document.getElementById('autocompleteDropdown').classList.add('hidden');
+                    return;
+                }
+                searchTimeout = setTimeout(function() {
+                    searchPelangganAutocomplete(keyword);
+                }, 300);
+            });
+
+            searchPelangganInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    var keyword = this.value;
+                    if (keyword.length >= 2) searchPelanggan(keyword);
+                }
+            });
+        }
+
         async function searchPelangganAutocomplete(keyword) {
             try {
-                const response = await fetch(`/peminjaman/pelanggan-list?search=${encodeURIComponent(keyword)}`);
-                const result = await response.json();
-                const dropdown = document.getElementById('autocompleteDropdown');
+                var response = await fetch('/peminjaman/pelanggan-list?search=' + encodeURIComponent(keyword));
+                var result = await response.json();
+                var dropdown = document.getElementById('autocompleteDropdown');
                 if (result.data && result.data.length > 0) {
-                    dropdown.innerHTML = result.data.map(p =>
-                        `<div onclick="selectPelangganSuggestion(${p.id}, '${escapeHtml(p.nama)}', '${escapeHtml(p.no_telepon)}')" class="px-4 py-2 hover:bg-gray-100 cursor-pointer border-b border-slate-100 last:border-0"><div class="font-medium">${escapeHtml(p.nama)}</div><div class="text-xs text-slate-500">${escapeHtml(p.no_telepon)}</div></div>`
-                        ).join('');
+                    var html = '';
+                    for (var i = 0; i < result.data.length; i++) {
+                        var p = result.data[i];
+                        html += '<div onclick="selectPelangganSuggestion(' + p.id + ', \'' + escapeHtml(p.nama) +
+                            '\', \'' + escapeHtml(p.no_telepon) +
+                            '\')" class="px-4 py-2 hover:bg-gray-100 cursor-pointer border-b border-slate-100 last:border-0"><div class="font-medium">' +
+                            escapeHtml(p.nama) + '</div><div class="text-xs text-slate-500">' + escapeHtml(p
+                                .no_telepon) + '</div></div>';
+                    }
+                    dropdown.innerHTML = html;
                     dropdown.classList.remove('hidden');
                 } else {
                     dropdown.classList.add('hidden');
@@ -1214,9 +1563,10 @@
             document.getElementById('autocompleteDropdown').classList.add('hidden');
             searchPelanggan(nama);
         }
+
         async function searchPelanggan(keyword) {
             try {
-                const response = await fetch('/peminjaman/cek-pelanggan', {
+                var response = await fetch('/peminjaman/cek-pelanggan', {
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
@@ -1226,14 +1576,39 @@
                         keyword: keyword
                     })
                 });
-                const result = await response.json();
+                var result = await response.json();
+
                 if (result.exists) {
-                    document.getElementById('hasilNama').textContent = result.data.nama;
+                    var isPelangganBaru = result.total_transaksi <= 1;
+                    var statusText = isPelangganBaru ? 'Pelanggan Baru' : 'Pelanggan Lama';
+                    var statusColor = isPelangganBaru ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700';
+
+                    document.getElementById('hasilNama').innerHTML = escapeHtml(result.data.nama) +
+                        ' <span class="text-xs ' + statusColor + ' px-2 py-0.5 rounded-full ml-2">' + statusText +
+                        '</span>';
                     document.getElementById('hasilTelepon').textContent = result.data.no_telepon;
                     document.getElementById('hasilEmail').textContent = result.data.email || '-';
-                    document.getElementById('hasilTotalTransaksi').textContent = result.total_transaksi;
-                    document.getElementById('hasilTotalNilai').textContent = formatRupiah(result.total_nilai);
-                    const statusSpan = document.getElementById('hasilStatus');
+                    document.getElementById('hasilTotalTransaksi').innerHTML = '<span class="text-lg font-bold">' +
+                        result.total_transaksi + '</span> <span class="text-sm ' + (isPelangganBaru ? 'text-green-600' :
+                            'text-blue-600') + ' ml-1">(transaksi)</span>';
+                    document.getElementById('hasilTotalNilai').innerHTML = '<span class="text-lg font-bold">' +
+                        formatRupiah(result.total_nilai) + '</span>';
+
+                    var statusInfo = document.getElementById('hasilStatusInfo');
+                    if (statusInfo) {
+                        statusInfo.innerHTML = '<div class="mb-3 p-2 rounded-lg ' + (isPelangganBaru ?
+                                'bg-green-50 border border-green-200' : 'bg-blue-50 border border-blue-200') +
+                            '"><i class="fas ' + (isPelangganBaru ? 'fa-star' : 'fa-chart-line') + ' mr-2 ' + (
+                                isPelangganBaru ? 'text-green-600' : 'text-blue-600') +
+                            '"></i><span class="text-sm font-semibold ' + (isPelangganBaru ? 'text-green-700' :
+                                'text-blue-700') + '">' + (isPelangganBaru ?
+                                'Pelanggan Baru - Ini adalah transaksi ke-' + (result.total_transaksi + 1) :
+                                'Pelanggan Lama - Sudah ' + result.total_transaksi + ' kali transaksi') +
+                            '</span></div>';
+                        statusInfo.classList.remove('hidden');
+                    }
+
+                    var statusSpan = document.getElementById('hasilStatus');
                     if (result.data.status === 'aktif') {
                         statusSpan.textContent = 'Aktif';
                         statusSpan.className =
@@ -1242,22 +1617,49 @@
                         statusSpan.textContent = 'Nonaktif';
                         statusSpan.className = 'px-2 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700';
                     }
-                    const riwayatList = document.getElementById('riwayatList');
-                    if (result.riwayat && result.riwayat.length > 0) riwayatList.innerHTML = result.riwayat.map(r =>
-                        `<div class="bg-white rounded-lg p-2 border border-slate-200"><div class="flex justify-between items-center"><span class="font-mono text-xs">${r.invoice_number}</span><span class="text-xs ${r.status_pengembalian === 'aktif' ? 'text-green-600' : 'text-gray-500'}">${r.status_pengembalian === 'aktif' ? '🟢 Aktif' : '✅ Selesai'}</span></div><div class="text-xs text-slate-500 mt-1">Tanggal: ${formatDate(r.tanggal_sewa)} - ${formatDate(r.tanggal_kembali)}</div><div class="text-xs font-semibold mt-1">Total: ${formatRupiah(r.grand_total)}</div></div>`
-                        ).join('');
-                    else riwayatList.innerHTML = '<p class="text-xs text-slate-500">Belum ada riwayat peminjaman</p>';
-                    window.selectedCustomer = result.data;
+
+                    var riwayatList = document.getElementById('riwayatList');
+                    if (result.riwayat && result.riwayat.length > 0) {
+                        var riwayatHtml = '';
+                        for (var i = 0; i < result.riwayat.length; i++) {
+                            var r = result.riwayat[i];
+                            riwayatHtml +=
+                                '<div class="bg-white rounded-lg p-2 border border-slate-200"><div class="flex justify-between items-center"><span class="font-mono text-xs font-semibold">' +
+                                r.invoice_number + '</span><span class="text-xs ' + (r.status_pengembalian === 'aktif' ?
+                                    'text-green-600' : 'text-gray-500') + '">' + (r.status_pengembalian === 'aktif' ?
+                                    '🟢 Aktif' : '✅ Selesai') +
+                                '</span></div><div class="text-xs text-slate-500 mt-1">Tanggal: ' + formatDate(r
+                                    .tanggal_sewa) + ' - ' + formatDate(r.tanggal_kembali) +
+                                '</div><div class="text-xs font-semibold mt-1">Total: ' + formatRupiah(r.grand_total) +
+                                '</div></div>';
+                        }
+                        riwayatList.innerHTML = riwayatHtml;
+                    } else {
+                        riwayatList.innerHTML = '<p class="text-xs text-slate-500">Belum ada riwayat peminjaman</p>';
+                    }
+
+                    selectedCustomer = result.data;
                     document.getElementById('hasilCekPelanggan').classList.remove('hidden');
                     document.getElementById('pelangganNotFound').classList.add('hidden');
                 } else {
                     document.getElementById('hasilCekPelanggan').classList.add('hidden');
                     document.getElementById('pelangganNotFound').classList.remove('hidden');
-                    const suggestionsContainer = document.getElementById('suggestionsContainer');
-                    if (result.suggestions && result.suggestions.length > 0) suggestionsContainer.innerHTML =
-                        `<p class="text-sm text-slate-600 mb-2">Pelanggan dengan nama mirip:</p>${result.suggestions.map(s => `<div onclick="selectPelangganSuggestion(${s.id}, '${escapeHtml(s.nama)}', '${escapeHtml(s.no_telepon)}')" class="p-2 bg-gray-100 rounded-lg mb-2 cursor-pointer hover:bg-gray-200"><div class="font-medium">${escapeHtml(s.nama)}</div><div class="text-xs text-slate-500">${escapeHtml(s.no_telepon)}</div></div>`).join('')}`;
-                    else suggestionsContainer.innerHTML = '';
-                    window.selectedCustomer = null;
+                    var suggestionsContainer = document.getElementById('suggestionsContainer');
+                    if (result.suggestions && result.suggestions.length > 0) {
+                        var suggestionsHtml = '<p class="text-sm text-slate-600 mb-2">Pelanggan dengan nama mirip:</p>';
+                        for (var i = 0; i < result.suggestions.length; i++) {
+                            var s = result.suggestions[i];
+                            suggestionsHtml += '<div onclick="selectPelangganSuggestion(' + s.id + ', \'' + escapeHtml(s
+                                    .nama) + '\', \'' + escapeHtml(s.no_telepon) +
+                                '\')" class="p-2 bg-gray-100 rounded-lg mb-2 cursor-pointer hover:bg-gray-200"><div class="font-medium">' +
+                                escapeHtml(s.nama) + '</div><div class="text-xs text-slate-500">' + escapeHtml(s
+                                    .no_telepon) + '</div></div>';
+                        }
+                        suggestionsContainer.innerHTML = suggestionsHtml;
+                    } else {
+                        suggestionsContainer.innerHTML = '';
+                    }
+                    selectedCustomer = null;
                 }
             } catch (error) {
                 console.error('Error:', error);
@@ -1266,15 +1668,17 @@
         }
 
         function useExistingCustomer() {
-            if (window.selectedCustomer) {
-                document.getElementById('pelanggan_id').value = window.selectedCustomer.id;
-                document.getElementById('nama_penyewa').value = window.selectedCustomer.nama;
-                document.getElementById('no_telepon').value = window.selectedCustomer.no_telepon;
-                document.getElementById('email').value = window.selectedCustomer.email || '';
-                document.getElementById('alamat').value = window.selectedCustomer.alamat || '';
-                document.getElementById('tipe_pelanggan').value = window.selectedCustomer.tipe || 'perorangan';
+            if (selectedCustomer) {
+                document.getElementById('pelanggan_id').value = selectedCustomer.id;
+                document.getElementById('nama_penyewa').value = selectedCustomer.nama;
+                document.getElementById('no_telepon').value = selectedCustomer.no_telepon;
+                document.getElementById('email').value = selectedCustomer.email || '';
+                document.getElementById('alamat').value = selectedCustomer.alamat || '';
+                document.getElementById('tipe_pelanggan').value = selectedCustomer.tipe || 'perorangan';
                 closeCekPelangganModal();
                 showToast('Data pelanggan berhasil diisi', 'success');
+            } else {
+                showToast('Tidak ada data pelanggan yang dipilih', 'error');
             }
         }
 
@@ -1286,18 +1690,26 @@
             document.getElementById('email').value = '';
             document.getElementById('alamat').value = '';
             document.getElementById('tipe_pelanggan').value = 'perorangan';
+            document.getElementById('nama_penyewa').focus();
         }
+
         document.addEventListener('click', function(e) {
-            const dropdown = document.getElementById('autocompleteDropdown');
-            const searchInput = document.getElementById('searchPelanggan');
-            if (dropdown && !dropdown.contains(e.target) && e.target !== searchInput) dropdown.classList.add(
-                'hidden');
+            var dropdown = document.getElementById('autocompleteDropdown');
+            var searchInputElem = document.getElementById('searchPelanggan');
+            if (dropdown && !dropdown.contains(e.target) && e.target !== searchInputElem) {
+                dropdown.classList.add('hidden');
+            }
         });
 
         // ==================== INITIALIZE ====================
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded - Initializing...');
             loadBarang();
             fetchData();
+
+            // Debug: cek tombol tambah
+            var btnTambah = document.querySelector('button[onclick="openTambahModal()"]');
+            console.log('Tombol tambah ditemukan:', btnTambah);
         });
     </script>
 @endsection
