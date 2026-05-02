@@ -126,7 +126,7 @@
         </div>
         </div>
         <!-- Kolom Reminder (Span 1) -->
-        <div style="background-color: #4d7cbf;" class="rounded-2xl p-4 shadow-lg relative overflow-hidden flex flex-col h-full">
+        <div style="background-color: #ffecec;" class="rounded-2xl p-4 shadow-lg relative overflow-hidden flex flex-col h-full">
             <h3 class="text-slate-900 font-black text-[12px] mb-3 flex items-center gap-2">
                 <span class="w-1.5 h-1.5 bg-red-600 rounded-full animate-pulse"></span>
                 Pengingat H-1
