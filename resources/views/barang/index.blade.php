@@ -3,108 +3,172 @@
 @section('title', 'Barang - Multidaya Inti Persada')
 @section('page-title', 'Manajemen Barang')
 @section('barang-active', 'bg-gray-100 text-gray-800 shadow-sm')
-
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 @section('main-content')
     <div class="px-4 sm:px-6 lg:px-8 py-4 sm:py-6 max-w-7xl mx-auto">
 
-        <!-- Header Section -->
-        <div class="mb-6">
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div>
-                    <h1 class="text-2xl sm:text-3xl font-bold text-slate-800">Barang</h1>
-                    <p class="text-slate-500 text-sm mt-1">Kelola data inventaris barang</p>
-                </div>
-                <button onclick="openModal()"
-                    class="bg-gray-700 hover:bg-gray-800 text-white font-semibold py-2 px-4 rounded-xl shadow-md transition flex items-center gap-2 w-full sm:w-auto justify-center">
-                    <i class="fas fa-plus-circle"></i>
-                    <span>Tambah Barang</span>
-                </button>
+        <!-- Header Section: Barang  -->
+    <div class="mb-5">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <!-- Text Content -->
+            <div>
+                <h1 class="text-xl sm:text-2xl font-bold text-slate-800 tracking-tight flex items-center gap-2">
+                    Barang
+                </h1>
+                <p class="text-slate-500 text-[11px] mt-1 ml-1">
+                    Kelola data inventaris dan ketersediaan barang secara real-time.
+                </p>
             </div>
+
+            <!-- Action Button: Interactive Edition -->
+            <button onclick="openModal()"
+                class="group relative overflow-hidden bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold py-2.5 px-5 rounded-xl transition-all duration-300 transform hover:-translate-y-0.5 active:scale-95 shadow-[0_4px_12px_rgba(79,70,229,0.3)] hover:shadow-[0_8px_20px_rgba(79,70,229,0.4)] flex items-center gap-2 justify-center">
+
+                <!-- Efek Cahaya (Glow Effect on Hover) -->
+                <div class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+
+                <i class="fas fa-plus-circle text-xs group-hover:rotate-90 transition-transform duration-300"></i>
+                <span>Tambah Barang</span>
+            </button>
         </div>
+    </div>
 
-        <!-- Filter Section -->
-        <div class="bg-white rounded-2xl shadow-md border border-slate-200 p-4 sm:p-6 mb-6">
-            <div class="flex flex-col sm:flex-row gap-4">
-                <div class="flex-1">
-                    <label class="block text-sm font-semibold text-slate-700 mb-2">
-                        <i class="fas fa-filter mr-2"></i>Tampilkan
-                    </label>
-                    <select id="filterJenis"
-                        class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 bg-white">
-                        <option value="all">Semua Barang</option>
-                        <option value="Proyektor">Proyektor</option>
-                        <option value="Layar">Layar</option>
-                        <option value="TV">TV</option>
-                        <option value="Kabel">Kabel</option>
-                    </select>
+            <!-- Stats Cards (Global Statistics): Modern Interactive Edition -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+
+                <!-- Total Barang -->
+                <div class="group bg-white rounded-[2rem] p-5 border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-indigo-500/5 transition-all duration-300 transform hover:-translate-y-1">
+                    <div class="flex items-start justify-between">
+                        <div class="space-y-2">
+                            <div class="flex items-center gap-2">
+                                <span class="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></span>
+                                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Barang</p>
+                            </div>
+                            <p class="text-2xl sm:text-3xl font-black text-slate-800 tracking-tight" id="totalBarang">0</p>
+                        </div>
+                        <div class="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-500 group-hover:bg-indigo-500 group-hover:text-white transition-all duration-500 shadow-inner">
+                            <i class="fas fa-boxes text-xl"></i>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="flex-1">
-                    <label class="block text-sm font-semibold text-slate-700 mb-2">
-                        <i class="fas fa-sort mr-2"></i>Urutkan
-                    </label>
-                    <select id="filterSort"
-                        class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 bg-white">
-                        <option value="default">Default (Terbaru)</option>
-                        <option value="name_asc">Nama A-Z</option>
-                        <option value="name_desc">Nama Z-A</option>
-                        <option value="price_asc">Harga Terendah</option>
-                        <option value="price_desc">Harga Tertinggi</option>
-                        <option value="stock_asc">Stok Sedikit</option>
-                        <option value="stock_desc">Stok Terbanyak</option>
-                    </select>
+                <!-- Total Stok -->
+                <div class="group bg-white rounded-[2rem] p-5 border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-amber-500/5 transition-all duration-300 transform hover:-translate-y-1">
+                    <div class="flex items-start justify-between">
+                        <div class="space-y-2">
+                            <div class="flex items-center gap-2">
+                                <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Stok</p>
+                            </div>
+                            <p class="text-2xl sm:text-3xl font-black text-slate-800 tracking-tight" id="totalStok">0</p>
+                        </div>
+                        <div class="w-12 h-12 rounded-2xl bg-amber-50 flex items-center justify-center text-amber-500 group-hover:bg-amber-500 group-hover:text-white transition-all duration-500 shadow-inner">
+                            <i class="fas fa-database text-xl"></i>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="flex-2">
-                    <label class="block text-sm font-semibold text-slate-700 mb-2">
-                        <i class="fas fa-search mr-2"></i>Cari
+                <!-- Tersedia -->
+                <div class="group bg-white rounded-[2rem] p-5 border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-emerald-500/5 transition-all duration-300 transform hover:-translate-y-1">
+                    <div class="flex items-start justify-between">
+                        <div class="space-y-2">
+                            <div class="flex items-center gap-2">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Tersedia</p>
+                            </div>
+                            <p class="text-2xl sm:text-3xl font-black text-emerald-600 tracking-tight" id="totalTersedia">0</p>
+                        </div>
+                        <div class="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-500 group-hover:bg-emerald-500 group-hover:text-white transition-all duration-500 shadow-inner">
+                            <i class="fas fa-check-circle text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Disewa -->
+                <div class="group bg-white rounded-[2rem] p-5 border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-rose-500/5 transition-all duration-300 transform hover:-translate-y-1">
+                    <div class="flex items-start justify-between">
+                        <div class="space-y-2">
+                            <div class="flex items-center gap-2">
+                                <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Disewa</p>
+                            </div>
+                            <p class="text-2xl sm:text-3xl font-black text-rose-600 tracking-tight" id="totalDisewa">0</p>
+                        </div>
+                        <div class="w-12 h-12 rounded-2xl bg-rose-50 flex items-center justify-center text-rose-500 group-hover:bg-rose-500 group-hover:text-white transition-all duration-500 shadow-inner">
+                            <i class="fas fa-hand-holding-heart text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+
+        <!-- Filter & Search Section: Modern Interactive -->
+        <div class="bg-white/80 backdrop-blur-md rounded-[2rem] shadow-sm border border-slate-100 p-6 mb-8 transition-all hover:shadow-md">
+            <div class="flex flex-col lg:flex-row gap-6">
+
+                <!-- Filter Kategori -->
+                <div class="flex-1 group">
+                    <label class="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1 group-focus-within:text-indigo-600 transition-colors">
+                        <i class="fas fa-filter mr-1.5"></i> Kategori
                     </label>
                     <div class="relative">
-                        <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
-                        <input type="text" id="searchInput" placeholder="Cari nama barang, kode, atau jenis..."
-                            class="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500">
+                        <select id="filterJenis"
+                            class="w-full pl-4 pr-10 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 appearance-none focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all cursor-pointer">
+                            <option value="all">Semua Barang</option>
+                            <option value="Proyektor">Proyektor</option>
+                            <option value="Layar">Layar</option>
+                            <option value="TV">TV</option>
+                            <option value="Kabel">Kabel</option>
+                        </select>
+                        <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                            <i class="fas fa-chevron-down text-[10px]"></i>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <!-- Stats Cards (Global Statistics) -->
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
-            <div class="bg-white rounded-2xl shadow-md border border-slate-200 p-4">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-xs sm:text-sm text-slate-500">Total Barang</p>
-                        <p class="text-xl sm:text-2xl font-bold text-slate-800" id="totalBarang">0</p>
+                <!-- Sort / Urutan -->
+                <div class="flex-1 group">
+                    <label class="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1 group-focus-within:text-indigo-600 transition-colors">
+                        <i class="fas fa-sort-amount-down mr-1.5"></i> Urutan
+                    </label>
+                    <div class="relative">
+                        <select id="filterSort"
+                            class="w-full pl-4 pr-10 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 appearance-none focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all cursor-pointer">
+                            <option value="default">Default (Terbaru)</option>
+                            <option value="name_asc">Nama A-Z</option>
+                            <option value="name_desc">Nama Z-A</option>
+                            <option value="price_asc">Harga Terendah</option>
+                            <option value="price_desc">Harga Tertinggi</option>
+                            <option value="stock_asc">Stok Sedikit</option>
+                            <option value="stock_desc">Stok Terbanyak</option>
+                        </select>
+                        <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                            <i class="fas fa-chevron-down text-[10px]"></i>
+                        </div>
                     </div>
-                    <i class="fas fa-boxes text-2xl sm:text-3xl text-gray-400"></i>
                 </div>
-            </div>
-            <div class="bg-white rounded-2xl shadow-md border border-slate-200 p-4">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-xs sm:text-sm text-slate-500">Total Stok</p>
-                        <p class="text-xl sm:text-2xl font-bold text-slate-800" id="totalStok">0</p>
+
+                <!-- Search Bar -->
+                <div class="flex-[1.5] group">
+                    <label class="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1 group-focus-within:text-indigo-600 transition-colors">
+                        <i class="fas fa-search mr-1.5"></i> Pencarian Cepat
+                    </label>
+                    <div class="relative">
+                        <input type="text" id="searchInput"
+                            placeholder="Cari nama, kode, atau kategori barang..."
+                            class="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 placeholder:text-slate-400 placeholder:font-medium focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all">
+                        <div class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors">
+                            <i class="fas fa-search"></i>
+                        </div>
+
+                        <!-- Kbd shortcut hint (opsional, hanya untuk tampilan desktop) -->
+                        <div class="absolute right-4 top-1/2 -translate-y-1/2 hidden sm:flex items-center gap-1">
+                            <span class="px-1.5 py-0.5 border border-slate-200 rounded text-[10px] text-slate-400 font-mono">/</span>
+                        </div>
                     </div>
-                    <i class="fas fa-database text-2xl sm:text-3xl text-gray-400"></i>
                 </div>
-            </div>
-            <div class="bg-white rounded-2xl shadow-md border border-slate-200 p-4">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-xs sm:text-sm text-slate-500">Tersedia</p>
-                        <p class="text-xl sm:text-2xl font-bold text-green-600" id="totalTersedia">0</p>
-                    </div>
-                    <i class="fas fa-check-circle text-2xl sm:text-3xl text-green-400"></i>
-                </div>
-            </div>
-            <div class="bg-white rounded-2xl shadow-md border border-slate-200 p-4">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-xs sm:text-sm text-slate-500">Disewa</p>
-                        <p class="text-xl sm:text-2xl font-bold text-blue-600" id="totalDisewa">0</p>
-                    </div>
-                    <i class="fas fa-hand-holding-usd text-2xl sm:text-3xl text-blue-400"></i>
-                </div>
+
             </div>
         </div>
 
@@ -151,221 +215,185 @@
     </div>
 
     <!-- Modal Form Tambah/Edit Barang -->
-    <div id="modalForm" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center p-4"
-        onclick="closeModalOnBackdrop(event)">
-        <div class="bg-white rounded-2xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto"
-            onclick="event.stopPropagation()">
-            <div class="sticky top-0 bg-white border-b border-slate-200 px-6 py-4 flex justify-between items-center">
-                <h3 id="modalTitle" class="text-xl font-bold text-slate-800">Tambah Unit</h3>
-                <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600">
-                    <i class="fas fa-times text-xl"></i>
-                </button>
+<!-- Modal Form Tambah/Edit Barang -->
+<div id="modalForm" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4 transition-all duration-300"
+    onclick="closeModalOnBackdrop(event)">
+
+    <!-- Perlebar max-w menjadi 2xl atau 3xl agar nyaman saat nyamping -->
+    <div class="bg-white rounded-[2.5rem] shadow-2xl max-w-3xl w-full max-h-[95vh] overflow-hidden flex flex-col animate-in fade-in zoom-in duration-200"
+        onclick="event.stopPropagation()">
+
+        <!-- Header Tetap -->
+        <div class="sticky top-0 bg-white/80 backdrop-blur-md border-b border-slate-100 px-8 py-5 flex justify-between items-center z-10">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center shadow-sm">
+                    <i id="headerIcon" class="fas fa-plus-circle text-lg"></i>
+                </div>
+                <div>
+                    <h3 id="modalTitle" class="text-xl font-black text-slate-800 tracking-tight">Tambah Unit</h3>
+                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Lengkapi data inventaris</p>
+                </div>
             </div>
+            <button onclick="closeModal()" class="w-10 h-10 flex items-center justify-center rounded-2xl text-slate-400 hover:bg-rose-50 hover:text-rose-500 transition-all">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
 
-            <form id="barangForm" class="p-6" enctype="multipart/form-data">
-                @csrf
-                <input type="hidden" name="id" id="barangId">
+        <!-- Form dibuat Grid 2 Kolom -->
+        <form id="barangForm" class="flex-1 overflow-y-auto custom-scrollbar p-8 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6" enctype="multipart/form-data">
+            @csrf
+            <input type="hidden" name="id" id="barangId">
 
-                <!-- Upload Image Area -->
-                <div class="mb-6">
-                    <label class="block text-sm font-semibold text-slate-700 mb-2">Gambar Barang</label>
-                    <div id="dropzone"
-                        class="border-2 border-dashed border-slate-300 rounded-xl p-6 text-center cursor-pointer hover:border-gray-500 transition">
-                        <i class="fas fa-cloud-upload-alt text-3xl text-slate-400 mb-2"></i>
-                        <p class="text-slate-500 text-sm">Drop gambar di sini, atau</p>
-                        <p class="text-gray-600 font-semibold text-sm">Klik untuk pilih file</p>
+            <!-- KOLOM KIRI: Visual & Deskripsi -->
+            <div class="space-y-6">
+                <div class="space-y-3">
+                    <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Visual Barang</label>
+                    <div id="dropzone" class="group border-2 border-dashed border-slate-200 rounded-[2rem] p-6 text-center cursor-pointer hover:border-indigo-400 hover:bg-indigo-50/30 transition-all duration-300">
+                        <div class="w-10 h-10 bg-slate-50 text-slate-400 rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 group-hover:bg-indigo-100 group-hover:text-indigo-600 transition-all">
+                            <i class="fas fa-cloud-upload-alt text-lg"></i>
+                        </div>
+                        <p class="text-xs font-bold text-slate-600">Klik atau Drop Gambar</p>
                         <input type="file" id="gambar" name="gambar" accept="image/*" class="hidden">
-                        <p class="text-xs text-slate-400 mt-2">Format: JPG, PNG (Max 1MB)</p>
                     </div>
-                    <div id="imagePreview" class="hidden mt-3 relative">
-                        <img id="previewImg" class="w-full h-32 object-cover rounded-lg">
-                        <button type="button" onclick="removeImage()"
-                            class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600">
-                            <i class="fas fa-times text-xs"></i>
+
+                    <div id="imagePreview" class="hidden relative group">
+                        <img id="previewImg" class="w-full h-32 object-cover rounded-[1.5rem] shadow-md border-4 border-white">
+                        <button type="button" onclick="removeImage()" class="absolute -top-2 -right-2 bg-rose-500 text-white rounded-lg p-1.5 shadow-lg">
+                            <i class="fas fa-trash-alt text-[10px]"></i>
                         </button>
                     </div>
-                    <div id="currentImage" class="hidden mt-3">
-                        <p class="text-xs text-slate-500 mb-1">Gambar saat ini:</p>
-                        <div class="relative">
-                            <img id="currentImg" class="w-full h-32 object-cover rounded-lg">
-                            <button type="button" onclick="removeCurrentImage()"
-                                class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600">
-                                <i class="fas fa-times text-xs"></i>
-                            </button>
+
+                    <div id="currentImage" class="hidden">
+                        <div class="relative group">
+                            <img id="currentImg" class="w-full h-32 object-cover rounded-[1.5rem] shadow-md border-4 border-indigo-50">
+                            <div class="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 rounded-[1.5rem] transition-opacity flex items-center justify-center">
+                                 <button type="button" onclick="removeCurrentImage()" class="bg-white/20 backdrop-blur-md text-white px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-rose-500 transition-colors">
+                                    Ganti
+                                 </button>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Nama Barang -->
-                <div class="mb-4">
-                    <label class="block text-sm font-semibold text-slate-700 mb-2">Nama Barang *</label>
-                    <input type="text" name="nama_barang" id="nama_barang" required
-                        class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500">
+                <div class="group">
+                    <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Spesifikasi Detail</label>
+                    <textarea name="deskripsi" id="deskripsi" rows="5" placeholder="Detail spesifikasi..."
+                        class="w-full mt-2 px-5 py-4 bg-slate-50 border-transparent rounded-[1.5rem] focus:bg-white focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all font-medium text-slate-600 text-sm italic"></textarea>
+                </div>
+            </div>
+
+            <!-- KOLOM KANAN: Detail & Stok -->
+            <div class="space-y-6">
+                <div class="group">
+                    <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Nama Perangkat</label>
+                    <input type="text" name="nama_barang" id="nama_barang" required placeholder="Nama barang..."
+                        class="w-full mt-2 px-5 py-3.5 bg-slate-50 border-transparent rounded-2xl focus:bg-white focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all font-bold text-slate-700">
                 </div>
 
-                <!-- Jenis -->
-                <div class="mb-4">
-                    <label class="block text-sm font-semibold text-slate-700 mb-2">Jenis *</label>
-                    <select name="jenis" id="jenis" required
-                        class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500">
-                        <option value="">Pilih Jenis</option>
-                        <option value="Proyektor">Proyektor</option>
-                        <option value="Layar">Layar</option>
-                        <option value="TV">TV</option>
-                        <option value="Kabel">Kabel</option>
-                    </select>
+                <div class="grid grid-cols-1 gap-4">
+                    <div class="group">
+                        <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Kategori</label>
+                        <select name="jenis" id="jenis" required
+                            class="w-full mt-2 px-4 py-3.5 bg-slate-50 border-transparent rounded-2xl focus:bg-white focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all font-bold text-slate-700">
+                            <option value="">Pilih...</option>
+                            <option value="Proyektor">Proyektor</option>
+                            <option value="Layar">Layar</option>
+                            <option value="TV">TV</option>
+                            <option value="Kabel">Kabel</option>
+                        </select>
+                    </div>
+                    <div class="group">
+                        <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Harga Sewa</label>
+                        <div class="relative mt-2">
+                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">Rp</span>
+                            <input type="number" name="harga_sewa" id="harga_sewa" required
+                                class="w-full pl-12 pr-5 py-3.5 bg-slate-50 border-transparent rounded-2xl focus:bg-white focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all font-bold text-slate-700 text-lg">
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Status & Kondisi -->
-                <div class="grid grid-cols-2 gap-4 mb-4">
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-2">Status</label>
-                        <select name="status" id="status"
-                            class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500">
+                <div class="bg-indigo-50/50 p-6 rounded-[2rem] border border-indigo-100/50 space-y-4">
+                    <div class="grid grid-cols-3 gap-3">
+                        <div class="space-y-1 text-center">
+                            <label class="text-[9px] font-black text-slate-400 uppercase">Stok</label>
+                            <input type="number" name="stok" id="stok" required
+                                class="w-full text-center py-2 bg-white rounded-xl border-none font-black text-slate-700">
+                        </div>
+                        <div class="space-y-1 text-center">
+                            <label class="text-[9px] font-black text-slate-400 uppercase">Ready</label>
+                            <input type="number" name="tersedia" id="tersedia" required
+                                class="w-full text-center py-2 bg-white rounded-xl border-none font-black text-emerald-600">
+                        </div>
+                        <div class="space-y-1 text-center">
+                            <label class="text-[9px] font-black text-slate-400 uppercase">Sewa</label>
+                            <input type="number" name="disewa" id="disewa" required
+                                class="w-full text-center py-2 bg-white rounded-xl border-none font-black text-blue-600">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <select name="status" id="status" class="bg-white px-3 py-2 rounded-xl text-[10px] font-black uppercase text-slate-600 outline-none">
                             <option value="aktif">Aktif</option>
                             <option value="nonaktif">Nonaktif</option>
                         </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-2">Kondisi</label>
-                        <select name="kondisi" id="kondisi"
-                            class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500">
+                        <select name="kondisi" id="kondisi" class="bg-white px-3 py-2 rounded-xl text-[10px] font-black uppercase text-slate-600 outline-none">
                             <option value="baik">Baik</option>
                             <option value="sedang">Sedang</option>
                             <option value="rusak">Rusak</option>
                         </select>
                     </div>
                 </div>
+            </div>
+        </form>
 
-                <!-- Stok, Tersedia, Disewa -->
-                <div class="grid grid-cols-3 gap-3 mb-4">
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-2">Stok *</label>
-                        <input type="number" name="stok" id="stok" required min="0" value="0"
-                            class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-2">Tersedia *</label>
-                        <input type="number" name="tersedia" id="tersedia" required min="0" value="0"
-                            class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-2">Disewa *</label>
-                        <input type="number" name="disewa" id="disewa" required min="0" value="0"
-                            class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500">
-                    </div>
-                </div>
-
-                <!-- Harga Sewa -->
-                <div class="mb-4">
-                    <label class="block text-sm font-semibold text-slate-700 mb-2">Harga Sewa (Rp) *</label>
-                    <input type="number" name="harga_sewa" id="harga_sewa" required min="0"
-                        class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500">
-                </div>
-
-                <!-- Spesifikasi -->
-                <div class="mb-6">
-                    <label class="block text-sm font-semibold text-slate-700 mb-2">Spesifikasi</label>
-                    <textarea name="deskripsi" id="deskripsi" rows="3"
-                        class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500"
-                        placeholder="Masukkan spesifikasi barang..."></textarea>
-                </div>
-
-                <!-- Tombol -->
-                <div class="flex gap-3 pt-4 border-t border-slate-200">
-                    <button type="submit"
-                        class="flex-1 bg-gray-700 hover:bg-gray-800 text-white font-semibold py-2 px-4 rounded-lg transition">
-                        Simpan
-                    </button>
-                    <button type="button" onclick="closeModal()"
-                        class="flex-1 border border-slate-300 rounded-lg text-slate-700 hover:bg-slate-50 transition py-2">
-                        Batal
-                    </button>
-                </div>
-            </form>
+        <!-- Footer Actions Tetap -->
+        <div class="p-6 bg-white border-t border-slate-100 flex gap-3">
+            <button type="submit" form="barangForm"
+                class="flex-[2] bg-slate-900 hover:bg-indigo-600 text-white font-black text-[11px] uppercase tracking-[0.2em] py-4 rounded-2xl transition-all shadow-lg active:scale-95">
+                Simpan Data
+            </button>
+            <button type="button" onclick="closeModal()"
+                class="flex-1 bg-white border-2 border-slate-100 text-slate-400 hover:text-slate-600 font-black text-[11px] uppercase tracking-widest py-4 rounded-2xl transition-all">
+                Batal
+            </button>
         </div>
     </div>
+</div>
 
     <!-- Modal Detail Barang -->
-    <div id="modalDetail" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center p-4"
-        onclick="closeDetailModalOnBackdrop(event)">
-        <div class="bg-white rounded-2xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto"
-            onclick="event.stopPropagation()">
-            <div class="sticky top-0 bg-white border-b border-slate-200 px-6 py-4">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <h3 id="detailNamaBarang" class="text-xl font-bold text-slate-800"></h3>
-                        <p id="detailStatus" class="text-sm mt-1"></p>
-                    </div>
-                    <button onclick="closeDetailModal()" class="text-slate-400 hover:text-slate-600">
-                        <i class="fas fa-times text-xl"></i>
-                    </button>
+    <!-- Modal Detail Barang -->
+<div id="modalDetail" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4 transition-all duration-300"
+    onclick="if(event.target===this) closeDetailModal()">
+
+    <div class="bg-white rounded-[2rem] shadow-2xl max-w-2xl w-full max-h-[85vh] overflow-hidden flex flex-col animate-in fade-in zoom-in duration-200">
+        <!-- Header: Consistent with Peminjaman -->
+        <div class="sticky top-0 bg-white/80 backdrop-blur-md border-b border-slate-100 px-8 py-5 flex justify-between items-center z-10">
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center shadow-sm">
+                    <i class="fas fa-box-open text-lg"></i>
+                </div>
+                <div>
+                    <h3 class="text-xl font-black text-slate-800 tracking-tight">Detail Informasi Barang</h3>
+                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Manajemen Aset & Inventaris</p>
                 </div>
             </div>
 
-            <!-- Content -->
-            <div class="p-6">
-                <!-- Gambar Barang -->
-                <div class="flex justify-center mb-6">
-                    <div id="detailImageContainer"
-                        class="w-32 h-32 bg-gray-100 rounded-2xl flex items-center justify-center overflow-hidden">
-                        <img id="detailImage" class="w-full h-full object-cover hidden">
-                        <i id="detailIcon" class="fas fa-tv text-5xl text-gray-400"></i>
-                    </div>
-                </div>
+            <button onclick="closeDetailModal()"
+                class="w-10 h-10 flex items-center justify-center rounded-2xl text-slate-400 hover:bg-rose-50 hover:text-rose-500 transition-all active:scale-90">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
 
-                <!-- Informasi Barang -->
-                <div class="space-y-4">
-                    <div class="flex justify-between items-center pb-2 border-b border-slate-100">
-                        <span class="text-slate-500 text-sm">Jenis</span>
-                        <span id="detailJenis" class="text-slate-800 font-medium text-sm"></span>
-                    </div>
-
-                    <div class="flex justify-between items-center pb-2 border-b border-slate-100">
-                        <span class="text-slate-500 text-sm">Kode Barang</span>
-                        <span id="detailKode" class="text-slate-800 font-medium text-sm font-mono"></span>
-                    </div>
-
-                    <div class="flex justify-between items-center pb-2 border-b border-slate-100">
-                        <span class="text-slate-500 text-sm">Harga Sewa</span>
-                        <span id="detailHarga" class="text-slate-800 font-bold text-sm"></span>
-                    </div>
-
-                    <div class="flex justify-between items-center pb-2 border-b border-slate-100">
-                        <span class="text-slate-500 text-sm">Stok</span>
-                        <span id="detailStok" class="text-slate-800 font-medium text-sm"></span>
-                    </div>
-
-                    <div class="flex justify-between items-center pb-2 border-b border-slate-100">
-                        <span class="text-slate-500 text-sm">Tersedia</span>
-                        <span id="detailTersedia" class="text-green-600 font-medium text-sm"></span>
-                    </div>
-
-                    <div class="flex justify-between items-center pb-2 border-b border-slate-100">
-                        <span class="text-slate-500 text-sm">Disewa</span>
-                        <span id="detailDisewa" class="text-blue-600 font-medium text-sm"></span>
-                    </div>
-
-                    <div class="pt-2">
-                        <span class="text-slate-500 text-sm block mb-2">Spesifikasi</span>
-                        <p id="detailSpesifikasi" class="text-slate-700 text-sm leading-relaxed"></p>
-                    </div>
-                </div>
-
-                <!-- Tombol Aksi -->
-                <div class="flex gap-3 mt-8 pt-4 border-t border-slate-200">
-                    <button onclick="editFromDetail()"
-                        class="flex-1 bg-gray-700 hover:bg-gray-800 text-white font-semibold py-2 px-4 rounded-lg transition">
-                        Edit
-                    </button>
-                    <button onclick="closeDetailModal()"
-                        class="flex-1 border border-slate-300 rounded-lg text-slate-700 hover:bg-slate-50 transition py-2">
-                        Batal
-                    </button>
-                </div>
+        <!-- Content Area: Data akan di-inject ke sini -->
+        <div id="detailContent" class="p-8 overflow-y-auto custom-scrollbar bg-slate-50/30">
+            <!-- Loading State Placeholder -->
+            <div class="flex flex-col items-center justify-center py-12 text-slate-300">
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-500 mb-4"></div>
+                <p class="text-xs font-bold uppercase tracking-widest">Menyiapkan Data...</p>
             </div>
         </div>
     </div>
+</div>
 
     <!-- Toast Notification -->
     <div id="toast" class="fixed bottom-4 right-4 bg-white rounded-lg shadow-lg p-4 hidden z-50">
@@ -594,12 +622,16 @@
         }
 
         // ==================== HELPER FUNCTIONS ====================
-        function formatRupiah(amount) {
+        function formatRupiah(angka) {
+            if (angka === null || angka === undefined) return 'Rp 0';
+
             return new Intl.NumberFormat('id-ID', {
                 style: 'currency',
                 currency: 'IDR',
-                minimumFractionDigits: 0
-            }).format(amount);
+                // Set bagian ini ke 0 untuk menghapus angka di belakang koma
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(angka);
         }
 
         function escapeHtml(text) {
@@ -660,80 +692,128 @@
         }
 
         // ==================== MODAL DETAIL FUNCTIONS ====================
-        function openDetailModal(id) {
-            fetch(`/barang/${id}`)
-                .then(response => response.json())
-                .then(result => {
-                    if (result.success) {
-                        const data = result.data;
+        // ==================== MODAL DETAIL FUNCTIONS ====================
+function openDetailModal(id) {
+    // Tampilkan loading state sederhana sebelum fetch selesai
+    const content = document.getElementById('detailContent');
+    content.innerHTML = `
+        <div class="flex flex-col items-center justify-center py-12">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-500 mb-4"></div>
+            <p class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Mengambil Data...</p>
+        </div>
+    `;
 
-                        document.getElementById('detailNamaBarang').textContent = data.nama_barang;
-                        document.getElementById('detailKode').textContent = data.kode_barang;
-                        document.getElementById('detailJenis').textContent = data.jenis;
-                        document.getElementById('detailHarga').textContent = formatRupiah(data.harga_sewa);
-                        document.getElementById('detailStok').textContent = data.stok;
-                        document.getElementById('detailTersedia').textContent = data.tersedia;
-                        document.getElementById('detailDisewa').textContent = data.disewa;
-                        document.getElementById('detailSpesifikasi').textContent = data.deskripsi ||
-                            'Tidak ada spesifikasi';
+    // Buka modal dulu (agar user tau ada proses)
+    document.getElementById('modalDetail').classList.remove('hidden');
+    document.getElementById('modalDetail').classList.add('flex');
 
-                        // Set status badge
-                        const statusBadge = document.getElementById('detailStatus');
-                        let statusClass = '';
-                        let statusText = '';
+    fetch(`/barang/${id}`)
+        .then(response => response.json())
+        .then(result => {
+            if (result.success) {
+                const data = result.data;
 
-                        if (data.disewa > 0) {
-                            statusClass = 'bg-blue-100 text-blue-700';
-                            statusText = `Status : Disewa (${data.disewa} unit)`;
-                        } else if (data.tersedia > 0) {
-                            statusClass = 'bg-green-100 text-green-700';
-                            statusText = 'Status : Tersedia';
-                        } else if (data.stok === 0) {
-                            statusClass = 'bg-red-100 text-red-700';
-                            statusText = 'Status : Habis';
-                        } else {
-                            statusClass = 'bg-yellow-100 text-yellow-700';
-                            statusText = 'Status : Tersedia Terbatas';
-                        }
+                // Tentukan Status Badge
+                let statusClass = '';
+                let statusText = '';
+                if (data.disewa > 0) {
+                    statusClass = 'bg-blue-50 text-blue-600 border border-blue-100';
+                    statusText = `Disewa (${data.disewa} unit)`;
+                } else if (data.tersedia > 0) {
+                    statusClass = 'bg-emerald-50 text-emerald-600 border border-emerald-100';
+                    statusText = 'Tersedia';
+                } else {
+                    statusClass = 'bg-rose-50 text-rose-600 border border-rose-100';
+                    statusText = 'Stok Habis';
+                }
 
-                        statusBadge.innerHTML =
-                            `<span class="inline-flex px-2 py-1 rounded-full text-xs font-semibold ${statusClass}">${statusText}</span>`;
+                // Inject UI Modern ke dalam detailContent
+                content.innerHTML = `
+                    <div class="flex flex-col md:flex-row gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <!-- Sisi Kiri: Visual -->
+                        <div class="w-full md:w-1/3 flex flex-col items-center">
+                            <div class="w-full aspect-square rounded-[2.5rem] bg-white border border-slate-100 shadow-sm overflow-hidden flex items-center justify-center p-2">
+                                ${data.gambar
+                                    ? `<img src="/storage/${data.gambar}" class="w-full h-full object-cover rounded-[2rem]">`
+                                    : `<div class="w-full h-full bg-slate-50 rounded-[2rem] flex items-center justify-center">
+                                         <i class="fas ${getIconByJenis(data.jenis)} text-5xl text-slate-200"></i>
+                                       </div>`}
+                            </div>
+                            <div class="mt-6">
+                                <span class="px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-widest ${statusClass}">
+                                    ${statusText}
+                                </span>
+                            </div>
+                        </div>
 
-                        // Set gambar
-                        const detailImg = document.getElementById('detailImage');
-                        const detailIcon = document.getElementById('detailIcon');
+                        <!-- Sisi Kanan: Informasi -->
+                        <div class="w-full md:w-2/3 space-y-6">
+                            <div>
+                                <h4 class="text-2xl font-black text-slate-800 tracking-tight leading-none">${data.nama_barang}</h4>
+                                <div class="flex items-center gap-2 mt-3">
+                                    <span class="text-indigo-600 font-mono font-bold text-xs bg-indigo-50 px-2 py-0.5 rounded">${data.kode_barang}</span>
+                                    <span class="text-slate-300">•</span>
+                                    <span class="text-xs font-bold text-slate-400 uppercase tracking-tighter">${data.jenis}</span>
+                                </div>
+                            </div>
 
-                        if (data.gambar) {
-                            detailImg.src = `/storage/${data.gambar}`;
-                            detailImg.classList.remove('hidden');
-                            detailIcon.classList.add('hidden');
-                        } else {
-                            detailImg.classList.add('hidden');
-                            detailIcon.classList.remove('hidden');
-                            detailIcon.className = `fas ${getIconByJenis(data.jenis)} text-5xl text-gray-400`;
-                        }
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
+                                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Harga Sewa</p>
+                                    <p class="text-lg font-black text-indigo-600">${formatRupiah(data.harga_sewa)}</p>
+                                </div>
+                                <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
+                                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Unit</p>
+                                    <p class="text-lg font-black text-slate-700">${data.stok} <span class="text-[10px] text-slate-300 uppercase">Aset</span></p>
+                                </div>
+                            </div>
 
-                        document.getElementById('modalDetail').setAttribute('data-id', data.id);
-                        document.getElementById('modalDetail').classList.remove('hidden');
-                        document.getElementById('modalDetail').classList.add('flex');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    showToast('Gagal mengambil data detail', 'error');
-                });
-        }
+                            <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm relative overflow-hidden group">
+                                <div class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                                    <i class="fas fa-quote-right text-3xl"></i>
+                                </div>
+                                <p class="text-[9px] font-black text-slate-300 uppercase tracking-widest mb-3">Deskripsi & Spesifikasi</p>
+                                <p class="text-sm text-slate-600 leading-relaxed font-medium italic">
+                                    ${data.deskripsi || 'Tidak ada spesifikasi tambahan untuk item ini.'}
+                                </p>
+                            </div>
 
-        function closeDetailModal() {
-            document.getElementById('modalDetail').classList.add('hidden');
-            document.getElementById('modalDetail').classList.remove('flex');
-        }
+                            <div class="flex items-center gap-8 px-2">
+                                <div class="flex flex-col">
+                                    <span class="text-[10px] font-bold text-slate-400 uppercase">Ready</span>
+                                    <span class="text-sm font-black text-emerald-600">${data.tersedia}</span>
+                                </div>
+                                <div class="h-8 w-px bg-slate-100"></div>
+                                <div class="flex flex-col">
+                                    <span class="text-[10px] font-bold text-slate-400 uppercase">On Rental</span>
+                                    <span class="text-sm font-black text-blue-600">${data.disewa}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
 
-        function closeDetailModalOnBackdrop(event) {
-            if (event.target === event.currentTarget) {
-                closeDetailModal();
+                // Simpan ID di modal untuk keperluan tombol Edit
+                document.getElementById('modalDetail').setAttribute('data-id', data.id);
             }
-        }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            content.innerHTML = `
+                <div class="text-center py-12">
+                    <i class="fas fa-exclamation-circle text-rose-500 text-3xl mb-3"></i>
+                    <p class="text-sm font-bold text-slate-700">Gagal mengambil data detail</p>
+                    <p class="text-xs text-slate-400 mt-1">Silakan coba beberapa saat lagi</p>
+                </div>
+            `;
+        });
+}
+
+function closeDetailModal() {
+    const modal = document.getElementById('modalDetail');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+}
 
         function editFromDetail() {
             const id = document.getElementById('modalDetail').getAttribute('data-id');
@@ -776,30 +856,76 @@
             }
         }
 
+        // ==================== DELETE POPUP ====================
         async function deleteData(id) {
-            if (confirm('Apakah Anda yakin ingin menghapus barang ini?')) {
+            const result = await Swal.fire({
+                title: 'Hapus Data?',
+                text: "Data ini tidak bisa dikembalikan.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#374151',
+                cancelButtonColor: '#ef4444',
+                confirmButtonText: 'Ya, Hapus',
+                cancelButtonText: 'Batal',
+
+                // --- PENGATURAN UKURAN ---
+                width: '320px', // Ukuran lebih kecil & compact
+                padding: '1.25rem',
+                iconColor: '#f8bb86',
+                // -------------------------
+
+                customClass: {
+                    popup: 'rounded-xl shadow-lg', // Corner lebih rapi
+                    title: 'text-lg font-bold pt-2', // Ukuran teks judul diperkecil
+                    htmlContainer: 'text-sm', // Ukuran teks deskripsi diperkecil
+                    confirmButton: 'text-sm py-2 px-4',
+                    cancelButton: 'text-sm py-2 px-4'
+                }
+            });
+
+            if (result.isConfirmed) {
                 try {
                     const response = await fetch(`/barang/${id}`, {
                         method: 'DELETE',
                         headers: {
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                            'Accept': 'application/json'
+                            'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
                         }
                     });
-                    const result = await response.json();
 
-                    if (result.success) {
-                        showToast(result.message, 'success');
-                        fetchGlobalStats();
+                    const data = await response.json();
+
+                    if (data.success) {
+                        // Notifikasi sukses juga dibuat kecil & dipojok (Toast)
+                        const Toast = Swal.mixin({
+                            toast: true,
+                            position: 'top-end',
+                            showConfirmButton: false,
+                            timer: 2000,
+                            timerProgressBar: true
+                        });
+
+                        Toast.fire({
+                            icon: 'success',
+                            title: 'Data berhasil dihapus'
+                        });
+
                         fetchData();
+                        fetchGlobalStats();
                     } else {
-                        showToast(result.message, 'error');
+                        throw new Error(data.message);
                     }
                 } catch (error) {
-                    showToast('Gagal menghapus data', 'error');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal',
+                        text: error.message,
+                        width: '320px'
+                    });
                 }
             }
-        }
+    }
 
         // ==================== FORM SUBMISSION ====================
         document.getElementById('barangForm').addEventListener('submit', async (e) => {

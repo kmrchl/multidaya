@@ -6,7 +6,7 @@
 
 @section('main-content')
 <div class="px-4 sm:px-6 lg:px-8 py-4 sm:py-6 max-w-7xl mx-auto">
-    
+
     <!-- Header -->
     <div class="mb-6">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -35,58 +35,95 @@
                     <option value="2025" {{ $tahun == 2025 ? 'selected' : '' }}>2025</option>
                     <option value="2026" {{ $tahun == 2026 ? 'selected' : '' }}>2026</option>
                 </select>
-                <button onclick="cetakLaporan()" 
-                        class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-xl shadow-md transition flex items-center gap-2">
-                    <i class="fas fa-print"></i>
+                <!-- Action Button: Cetak Laporan (Blue Interactive Edition) -->
+                <button onclick="cetakLaporan()"
+                    class="group relative overflow-hidden bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-black uppercase tracking-[0.15em] py-3 px-6 rounded-2xl transition-all duration-300 transform hover:-translate-y-1 active:scale-95 shadow-[0_4px_12px_rgba(37,99,235,0.3)] hover:shadow-[0_8px_20px_rgba(37,99,235,0.4)] flex items-center gap-3 justify-center">
+
+                    <!-- Efek Cahaya (Glow Sweep) -->
+                    <div class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/25 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+
+                    <i class="fas fa-print text-xs group-hover:rotate-12 transition-transform duration-300"></i>
                     <span>Cetak Laporan</span>
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Stats Cards (sama seperti sebelumnya) -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-        <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-2xl shadow-lg p-6 text-white cursor-pointer hover:scale-105 transition-transform" onclick="filterByPendapatan()">
-            <div class="flex justify-between items-start">
-                <div>
-                    <p class="text-green-100 text-sm">Pendapatan dari Sewa</p>
-                    <p class="text-3xl font-bold mt-2">Rp {{ number_format($totalPendapatan, 0, ',', '.') }}</p>
-                    <p class="text-green-100 text-sm mt-2">
+    <!-- Stats Cards: Interactive Finance Edition -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+
+        <!-- Card Pendapatan -->
+        <div onclick="filterByPendapatan()"
+            class="group bg-white rounded-[2rem] p-6 border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-emerald-500/10 transition-all duration-300 transform hover:-translate-y-1 cursor-pointer">
+            <div class="flex items-start justify-between">
+                <div class="space-y-3">
+                    <div class="flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Pendapatan Sewa</p>
+                    </div>
+                    <p class="text-2xl sm:text-3xl font-black text-slate-800 tracking-tight">
+                        Rp {{ number_format($totalPendapatan, 0, ',', '.') }}
+                    </p>
+                    <div class="flex items-center gap-1.5 {{ $pendapatanGrowth >= 0 ? 'text-emerald-600' : 'text-rose-600' }} font-bold text-xs">
                         <i class="fas {{ $pendapatanGrowth >= 0 ? 'fa-arrow-up' : 'fa-arrow-down' }}"></i>
-                        {{ number_format(abs($pendapatanGrowth), 1) }}% dari bulan lalu
-                    </p>
+                        <span>{{ number_format(abs($pendapatanGrowth), 1) }}%</span>
+                        <span class="text-slate-400 font-medium italic">vs bln lalu</span>
+                    </div>
                 </div>
-                <i class="fas fa-chart-line text-4xl text-green-200"></i>
+                <div class="w-14 h-14 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-500 group-hover:bg-emerald-500 group-hover:text-white transition-all duration-500 shadow-inner">
+                    <i class="fas fa-chart-line text-2xl"></i>
+                </div>
             </div>
         </div>
-        
-        <div class="bg-gradient-to-br from-red-500 to-red-600 rounded-2xl shadow-lg p-6 text-white cursor-pointer hover:scale-105 transition-transform" onclick="filterByBiaya()">
-            <div class="flex justify-between items-start">
-                <div>
-                    <p class="text-red-100 text-sm">Total Biaya</p>
-                    <p class="text-3xl font-bold mt-2">Rp {{ number_format($totalPengeluaran, 0, ',', '.') }}</p>
-                    <p class="text-red-100 text-sm mt-2">
+
+        <!-- Card Total Biaya -->
+        <div onclick="filterByBiaya()"
+            class="group bg-white rounded-[2rem] p-6 border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-rose-500/10 transition-all duration-300 transform hover:-translate-y-1 cursor-pointer">
+            <div class="flex items-start justify-between">
+                <div class="space-y-3">
+                    <div class="flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Pengeluaran</p>
+                    </div>
+                    <p class="text-2xl sm:text-3xl font-black text-slate-800 tracking-tight">
+                        Rp {{ number_format($totalPengeluaran, 0, ',', '.') }}
+                    </p>
+                    <div class="flex items-center gap-1.5 {{ $pengeluaranGrowth <= 0 ? 'text-emerald-600' : 'text-rose-600' }} font-bold text-xs">
                         <i class="fas {{ $pengeluaranGrowth >= 0 ? 'fa-arrow-up' : 'fa-arrow-down' }}"></i>
-                        {{ number_format(abs($pengeluaranGrowth), 1) }}% dari bulan lalu
-                    </p>
+                        <span>{{ number_format(abs($pengeluaranGrowth), 1) }}%</span>
+                        <span class="text-slate-400 font-medium italic">vs bln lalu</span>
+                    </div>
                 </div>
-                <i class="fas fa-chart-line text-4xl text-red-200"></i>
+                <div class="w-14 h-14 rounded-2xl bg-rose-50 flex items-center justify-center text-rose-500 group-hover:bg-rose-500 group-hover:text-white transition-all duration-500 shadow-inner">
+                    <i class="fas fa-receipt text-2xl"></i>
+                </div>
             </div>
         </div>
-        
-        <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl shadow-lg p-6 text-white cursor-pointer hover:scale-105 transition-transform" onclick="filterByLaba()">
-            <div class="flex justify-between items-start">
-                <div>
-                    <p class="text-blue-100 text-sm">Laba Bersih</p>
-                    <p class="text-3xl font-bold mt-2">Rp {{ number_format($labaBersih, 0, ',', '.') }}</p>
-                    <p class="text-blue-100 text-sm mt-2">
+
+        <!-- Card Laba Bersih -->
+        <div onclick="filterByLaba()"
+            class="group bg-white rounded-[2rem] p-6 border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-blue-500/10 transition-all duration-300 transform hover:-translate-y-1 cursor-pointer">
+            <div class="flex items-start justify-between">
+                <div class="space-y-3">
+                    <div class="flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Laba Bersih</p>
+                    </div>
+                    <p class="text-2xl sm:text-3xl font-black text-blue-600 tracking-tight">
+                        Rp {{ number_format($labaBersih, 0, ',', '.') }}
+                    </p>
+                    <div class="flex items-center gap-1.5 {{ $labaGrowth >= 0 ? 'text-emerald-600' : 'text-rose-600' }} font-bold text-xs">
                         <i class="fas {{ $labaGrowth >= 0 ? 'fa-arrow-up' : 'fa-arrow-down' }}"></i>
-                        {{ number_format(abs($labaGrowth), 1) }}% dari bulan lalu
-                    </p>
+                        <span>{{ number_format(abs($labaGrowth), 1) }}%</span>
+                        <span class="text-slate-400 font-medium italic">vs bln lalu</span>
+                    </div>
                 </div>
-                <i class="fas fa-chart-pie text-4xl text-blue-200"></i>
+                <div class="w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-500 group-hover:bg-blue-500 group-hover:text-white transition-all duration-500 shadow-inner">
+                    <i class="fas fa-wallet text-2xl"></i>
+                </div>
             </div>
         </div>
+
     </div>
 
     <!-- Chart & Recent Transactions -->
@@ -109,7 +146,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="bg-white rounded-2xl shadow-md border border-slate-200 p-6">
             <h3 class="font-bold text-slate-800 mb-4">
                 <i class="fas fa-history mr-2"></i>Transaksi Terbaru
@@ -124,8 +161,8 @@
                         <div>
                             <p class="font-medium text-slate-800">{{ $transaksi->deskripsi }}</p>
                             <p class="text-xs text-slate-500">
-                                {{ \Carbon\Carbon::parse($transaksi->tanggal)->format('d M Y') }} • 
-                                {{ $transaksi->kategori }} • 
+                                {{ \Carbon\Carbon::parse($transaksi->tanggal)->format('d M Y') }} •
+                                {{ $transaksi->kategori }} •
                                 <span class="capitalize">{{ $transaksi->sumber }}</span>
                             </p>
                         </div>
@@ -143,82 +180,117 @@
         </div>
     </div>
 
-    <!-- Top Barang & Rincian Biaya -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div class="bg-white rounded-2xl shadow-md border border-slate-200 p-6">
-            <h3 class="font-bold text-slate-800 mb-4">
-                <i class="fas fa-trophy mr-2"></i>Top Barang Terlaris
-            </h3>
-            <div class="space-y-4">
-                @forelse($topBarang as $index => $barang)
-                <div>
-                    <div class="flex justify-between text-sm mb-1">
-                        <span class="text-slate-600">{{ $index + 1 }}. {{ $barang->nama_barang }}</span>
-                        <span class="font-semibold text-slate-800">{{ $barang->total_sewa }}x sewa</span>
-                    </div>
-                    @php
-                        $maxTotal = $topBarang->max('total_sewa');
-                        $percentage = ($maxTotal > 0) ? ($barang->total_sewa / $maxTotal) * 100 : 0;
-                    @endphp
-                    <div class="w-full bg-slate-200 rounded-full h-2">
-                        <div class="bg-blue-500 h-2 rounded-full" style="width: {{ $percentage }}%"></div>
-                    </div>
-                </div>
-                @empty
-                <p class="text-slate-500 text-center py-4">Belum ada data barang</p>
-                @endforelse
+    <!-- Top Barang & Rincian Biaya: Modern & Balanced Edition -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
+
+    <!-- Card Top Barang Terlaris -->
+    <div class="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 p-8 hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-500">
+        <div class="flex items-center gap-4 mb-8">
+            <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center shadow-sm">
+                <i class="fas fa-trophy text-lg"></i>
+            </div>
+            <div>
+                <h3 class="text-xl font-black text-slate-800 tracking-tight">Top Barang Terlaris</h3>
+                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Produk Paling Sering Disewa</p>
             </div>
         </div>
-        
-        <!-- Card Biaya Operasional dengan Tombol Tambah -->
-        <div class="bg-white rounded-2xl shadow-md border border-slate-200 p-6">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="font-bold text-slate-800">
-                    <i class="fas fa-chart-pie mr-2"></i>Rincian Biaya
-                </h3>
-                <button onclick="openTambahBiayaModal()" 
-                        class="bg-gray-700 hover:bg-gray-800 text-white font-semibold py-1.5 px-3 rounded-lg transition flex items-center gap-1 text-sm">
-                    <i class="fas fa-plus-circle"></i>
-                    <span>Tambah Biaya</span>
-                </button>
-            </div>
-            <div class="space-y-4">
+
+        <div class="space-y-6">
+            @forelse($topBarang as $index => $barang)
                 @php
-                    $kelompokBiaya = [
-                        'operasional' => ['label' => 'Operasional', 'icon' => 'fa-building', 'color' => 'red'],
-                        'promosi' => ['label' => 'Promosi', 'icon' => 'fa-megaphone', 'color' => 'purple'],
-                        'inventaris' => ['label' => 'Inventaris', 'icon' => 'fa-boxes', 'color' => 'orange']
-                    ];
+                    $maxTotal = $topBarang->max('total_sewa');
+                    $percentage = ($maxTotal > 0) ? ($barang->total_sewa / $maxTotal) * 100 : 0;
                 @endphp
-                
-                @foreach($kelompokBiaya as $key => $info)
-                    @php
-                        $total = $pengeluaranByKategori->where('sumber', $key)->sum('total');
-                        $persen = $totalPengeluaran > 0 ? ($total / $totalPengeluaran) * 100 : 0;
-                    @endphp
-                    <div>
-                        <div class="flex justify-between text-sm mb-1">
-                            <span class="text-slate-600">
-                                <i class="fas {{ $info['icon'] }} mr-2 text-{{ $info['color'] }}-500"></i>
-                                {{ $info['label'] }}
+                <div class="group">
+                    <div class="flex justify-between items-end mb-2">
+                        <div class="flex items-center gap-3">
+                            <span class="flex items-center justify-center w-6 h-6 rounded-lg bg-slate-50 text-slate-400 text-[10px] font-black group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                                {{ $index + 1 }}
                             </span>
-                            <span class="font-semibold text-slate-800">Rp {{ number_format($total, 0, ',', '.') }}</span>
+                            <span class="text-sm font-bold text-slate-700 group-hover:text-indigo-600 transition-colors">{{ $barang->nama_barang }}</span>
                         </div>
-                        <div class="w-full bg-slate-200 rounded-full h-2">
-                            <div class="bg-{{ $info['color'] }}-500 h-2 rounded-full" style="width: {{ $persen }}%"></div>
-                        </div>
+                        <span class="text-xs font-black text-slate-400 uppercase tracking-tighter">{{ $barang->total_sewa }}x <span class="font-bold text-[10px]">Sewa</span></span>
                     </div>
-                @endforeach
-                
-                @if($totalPengeluaran > 0)
-                <div class="pt-3 border-t border-slate-200">
-                    <div class="flex justify-between text-sm font-semibold">
-                        <span>Total Biaya</span>
-                        <span class="text-red-600">Rp {{ number_format($totalPengeluaran, 0, ',', '.') }}</span>
+                    <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
+                        <div class="bg-gradient-to-r from-indigo-500 to-blue-500 h-full rounded-full transition-all duration-1000 shadow-[0_0_8px_rgba(79,70,229,0.4)]"
+                             style="width: {{ $percentage }}%"></div>
                     </div>
                 </div>
-                @endif
+            @empty
+                <div class="flex flex-col items-center justify-center py-12 opacity-40">
+                    <i class="fas fa-box-open text-4xl mb-3 text-slate-300"></i>
+                    <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Belum ada data barang</p>
+                </div>
+            @endforelse
+        </div>
+    </div>
+
+    <!-- Card Rincian Biaya -->
+    <div class="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 p-8 hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-500">
+        <div class="flex justify-between items-center mb-8">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center shadow-sm">
+                    <i class="fas fa-chart-pie text-lg"></i>
+                </div>
+                <div>
+                    <h3 class="text-xl font-black text-slate-800 tracking-tight">Rincian Biaya</h3>
+                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Alokasi Pengeluaran Kas</p>
+                </div>
             </div>
+
+            <!-- Button Tambah Biaya (Interactive Edition) -->
+            <button onclick="openTambahBiayaModal()"
+                class="group relative overflow-hidden bg-slate-800 hover:bg-rose-600 text-white text-[10px] font-black uppercase tracking-widest py-2.5 px-4 rounded-xl transition-all duration-300 transform hover:-translate-y-1 active:scale-95 shadow-lg shadow-slate-200 flex items-center gap-2">
+                <div class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+                <i class="fas fa-plus-circle"></i>
+                <span>Tambah</span>
+            </button>
+        </div>
+
+        <div class="space-y-6">
+            @php
+                $kelompokBiaya = [
+                    'operasional' => ['label' => 'Operasional', 'icon' => 'fa-building', 'color' => 'rose'],
+                    'promosi' => ['label' => 'Promosi', 'icon' => 'fa-bullhorn', 'color' => 'violet'],
+                    'inventaris' => ['label' => 'Inventaris', 'icon' => 'fa-boxes', 'color' => 'amber']
+                ];
+            @endphp
+
+            @foreach($kelompokBiaya as $key => $info)
+                @php
+                    $total = $pengeluaranByKategori->where('sumber', $key)->sum('total');
+                    $persen = $totalPengeluaran > 0 ? ($total / $totalPengeluaran) * 100 : 0;
+                    $colorHex = [
+                        'rose' => 'from-rose-500 to-pink-500',
+                        'violet' => 'from-violet-500 to-purple-500',
+                        'amber' => 'from-amber-500 to-orange-500'
+                    ][$info['color']];
+                @endphp
+                <div class="group">
+                    <div class="flex justify-between items-center mb-2">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-{{ $info['color'] }}-50 text-{{ $info['color'] }}-500 flex items-center justify-center text-xs group-hover:bg-{{ $info['color'] }}-500 group-hover:text-white transition-all">
+                                <i class="fas {{ $info['icon'] }}"></i>
+                            </div>
+                            <span class="text-sm font-bold text-slate-700">{{ $info['label'] }}</span>
+                        </div>
+                        <span class="text-sm font-black text-slate-800 tracking-tight">Rp {{ number_format($total, 0, ',', '.') }}</span>
+                    </div>
+                    <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
+                        <div class="bg-gradient-to-r {{ $colorHex }} h-full rounded-full transition-all duration-1000 shadow-sm"
+                             style="width: {{ $persen }}%"></div>
+                    </div>
+                </div>
+            @endforeach
+
+            @if($totalPengeluaran > 0)
+            <div class="mt-8 pt-6 border-t border-dashed border-slate-200">
+                <div class="flex justify-between items-center p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                    <span class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Total Akumulasi</span>
+                    <span class="text-lg font-black text-rose-600 tracking-tight">Rp {{ number_format($totalPengeluaran, 0, ',', '.') }}</span>
+                </div>
+            </div>
+            @endif
         </div>
     </div>
 </div>
@@ -227,7 +299,7 @@
 <div id="modalSidebar" class="fixed inset-0 z-50 hidden">
     <!-- Overlay -->
     <div class="absolute inset-0 bg-black/50" onclick="closeTambahBiayaModal()"></div>
-    
+
     <!-- Sidebar Content (slide from right) -->
     <div class="absolute right-0 top-0 h-full w-full max-w-md bg-white shadow-2xl transform translate-x-full transition-transform duration-300 ease-out" id="sidebarContent">
         <div class="h-full flex flex-col">
@@ -240,7 +312,7 @@
                     <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
-            
+
             <!-- Form -->
             <form id="formBiaya" class="flex-1 overflow-y-auto p-6">
                 @csrf
@@ -253,38 +325,38 @@
                             <option value="inventaris">Inventaris / Stok Barang</option>
                         </select>
                     </div>
-                    
+
                     <div>
                         <label class="block text-sm font-semibold text-slate-700 mb-1">Kategori *</label>
                         <input type="text" name="kategori" id="kategori" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent" placeholder="Contoh: Gaji, Listrik, Iklan, Beli Barang">
                     </div>
-                    
+
                     <div>
                         <label class="block text-sm font-semibold text-slate-700 mb-1">Deskripsi *</label>
                         <input type="text" name="deskripsi" id="deskripsi" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent" placeholder="Keterangan detail">
                     </div>
-                    
+
                     <div>
                         <label class="block text-sm font-semibold text-slate-700 mb-1">Jumlah (Rp) *</label>
                         <input type="number" name="jumlah" id="jumlah" required min="0" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent" placeholder="0">
                     </div>
-                    
+
                     <div>
                         <label class="block text-sm font-semibold text-slate-700 mb-1">Tanggal *</label>
                         <input type="date" name="tanggal" id="tanggal" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent" value="{{ date('Y-m-d') }}">
                     </div>
-                    
+
                     <div>
                         <label class="block text-sm font-semibold text-slate-700 mb-1">Referensi (Opsional)</label>
                         <input type="text" name="referensi" id="referensi" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent" placeholder="No. Invoice / Nota">
                     </div>
-                    
+
                     <div>
                         <label class="block text-sm font-semibold text-slate-700 mb-1">Keterangan</label>
                         <textarea name="keterangan" id="keterangan" rows="3" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent" placeholder="Catatan tambahan..."></textarea>
                     </div>
                 </div>
-                
+
                 <!-- Buttons -->
                 <div class="flex gap-3 mt-6 pt-4 border-t border-slate-200">
                     <button type="submit" class="flex-1 bg-gray-700 hover:bg-gray-800 text-white font-semibold py-2.5 rounded-lg transition">
@@ -421,7 +493,7 @@ document.getElementById('formBiaya').addEventListener('submit', async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
     const data = Object.fromEntries(formData.entries());
-    
+
     try {
         const response = await fetch('/keuangan', {
             method: 'POST',
