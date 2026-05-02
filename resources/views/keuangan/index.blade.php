@@ -54,7 +54,7 @@
 
         <!-- Card Pendapatan -->
         <div onclick="filterByPendapatan()"
-            class="group bg-white rounded-[2rem] p-6 border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-emerald-500/10 transition-all duration-300 transform hover:-translate-y-1 cursor-pointer">
+            class="group bg-white rounded-4xl p-6 border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-emerald-500/10 transition-all duration-300 transform hover:-translate-y-1 cursor-pointer">
             <div class="flex items-start justify-between">
                 <div class="space-y-3">
                     <div class="flex items-center gap-2">
@@ -78,7 +78,7 @@
 
         <!-- Card Total Biaya -->
         <div onclick="filterByBiaya()"
-            class="group bg-white rounded-[2rem] p-6 border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-rose-500/10 transition-all duration-300 transform hover:-translate-y-1 cursor-pointer">
+            class="group bg-white rounded-4xl p-6 border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-rose-500/10 transition-all duration-300 transform hover:-translate-y-1 cursor-pointer">
             <div class="flex items-start justify-between">
                 <div class="space-y-3">
                     <div class="flex items-center gap-2">
@@ -102,7 +102,7 @@
 
         <!-- Card Laba Bersih -->
         <div onclick="filterByLaba()"
-            class="group bg-white rounded-[2rem] p-6 border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-blue-500/10 transition-all duration-300 transform hover:-translate-y-1 cursor-pointer">
+            class="group bg-white rounded-4xl p-6 border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-blue-500/10 transition-all duration-300 transform hover:-translate-y-1 cursor-pointer">
             <div class="flex items-start justify-between">
                 <div class="space-y-3">
                     <div class="flex items-center gap-2">

@@ -196,10 +196,10 @@
                         <span class="text-sm font-bold">Cari Data Pelanggan Lama</span>
                     </button>
                     <div class="relative flex py-4 items-center">
-                        <div class="flex-grow border-t border-slate-100"></div>
-                        <span class="flex-shrink mx-4 text-[10px] font-black text-slate-300 uppercase tracking-[0.2em]">Atau
+                        <div class="grow border-t border-slate-100"></div>
+                        <span class="shrink mx-4 text-[10px] font-black text-slate-300 uppercase tracking-[0.2em]">Atau
                             Input Manual</span>
-                        <div class="flex-grow border-t border-slate-100"></div>
+                        <div class="grow border-t border-slate-100"></div>
                     </div>
                 </div>
 
@@ -212,7 +212,7 @@
                         <div class="flex items-center gap-3 mb-5 text-indigo-600">
                             <i class="fas fa-user-circle"></i>
                             <span class="text-xs font-black uppercase tracking-widest">Informasi Penyewa</span>
-                            <div class="h-[1px] flex-1 bg-slate-100"></div>
+                            <div class="h-px flex-1 bg-slate-100"></div>
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -432,7 +432,7 @@
                         <div class="flex items-center gap-3 mb-5 text-amber-600">
                             <i class="fas fa-id-card"></i>
                             <span class="text-xs font-black uppercase tracking-widest">Identitas & Penyewa</span>
-                            <div class="h-[1px] flex-1 bg-slate-100"></div>
+                            <div class="h-px flex-1 bg-slate-100"></div>
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -478,7 +478,7 @@
                         <div class="flex items-center gap-3 mb-5 text-amber-600">
                             <i class="fas fa-clock"></i>
                             <span class="text-xs font-black uppercase tracking-widest">Penjadwalan Ulang</span>
-                            <div class="h-[1px] flex-1 bg-slate-100"></div>
+                            <div class="h-px flex-1 bg-slate-100"></div>
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -527,7 +527,7 @@
                         <div class="flex items-center gap-3 mb-5 text-amber-600">
                             <i class="fas fa-boxes"></i>
                             <span class="text-xs font-black uppercase tracking-widest">Detail Barang Sewa</span>
-                            <div class="h-[1px] flex-1 bg-slate-100"></div>
+                            <div class="h-px flex-1 bg-slate-100"></div>
                         </div>
 
                         <div id="editBarangContainer"
@@ -883,7 +883,7 @@
     </div>
 
     {{-- ==================== MODAL DELETE CONFIRMATION ==================== --}}
-    <div id="modalDeleteConfirm" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
+    <div id="modalDeleteConfirm" class="fixed inset-0 z-100 hidden items-center justify-center p-4">
         <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onclick="closeDeleteModal()">
         </div>
         <div

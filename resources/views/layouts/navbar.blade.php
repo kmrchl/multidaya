@@ -12,9 +12,12 @@
         <div class="px-6 pt-8 pb-6 border-b border-[#cfe1f4]">
             <a href="{{ route('dashboard') }}" class="flex items-center gap-3 group relative overflow-hidden rounded-xl">
                 <!-- Efek cahaya pada brand saat hover -->
-                <div class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
-                
-                <div class="h-10 w-10 flex items-center justify-center overflow-hidden rounded-xl shadow-sm group-hover:shadow-md transition-all duration-200">
+                <div
+                    class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700">
+                </div>
+
+                <div
+                    class="h-10 w-10 flex items-center justify-center overflow-hidden rounded-xl shadow-sm group-hover:shadow-md transition-all duration-200">
                     <img src="{{ asset('images/logo.png') }}" alt="Logo Multidaya" class="h-full w-full object-contain">
                 </div>
 
@@ -32,8 +35,11 @@
                 class="relative overflow-hidden flex items-center gap-3 px-4 py-3 text-sm font-semibold rounded-xl transition-all duration-300 group
                 @if (Request::routeIs('dashboard')) bg-[#213c61] text-white shadow-md @else text-slate-600 hover:bg-[#213c61] hover:text-white @endif">
                 <!-- Efek Cahaya (Glow Sweep) untuk semua menu -->
-                <div class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 pointer-events-none"></div>
-                <i class="fas fa-tachometer-alt w-5 relative z-10 @if (Request::routeIs('dashboard')) text-white @else text-[#4d7cbf] group-hover:text-white @endif"></i>
+                <div
+                    class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 pointer-events-none">
+                </div>
+                <i
+                    class="fas fa-tachometer-alt w-5 relative z-10 @if (Request::routeIs('dashboard')) text-white @else text-[#4d7cbf] group-hover:text-white @endif"></i>
                 <span class="relative z-10">Dashboard</span>
             </a>
 
@@ -42,8 +48,11 @@
                 class="relative overflow-hidden flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all duration-300 group
                 @if (Request::routeIs('peminjaman.index')) bg-[#213c61] text-white shadow-md @else text-slate-600 hover:bg-[#213c61] hover:text-white @endif">
                 <!-- Efek Cahaya (Glow Sweep) -->
-                <div class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 pointer-events-none"></div>
-                <i class="fas fa-hand-holding-usd w-5 relative z-10 @if (Request::routeIs('peminjaman.index')) text-white @else text-[#4d7cbf] group-hover:text-white @endif"></i>
+                <div
+                    class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 pointer-events-none">
+                </div>
+                <i
+                    class="fas fa-hand-holding-usd w-5 relative z-10 @if (Request::routeIs('peminjaman.index')) text-white @else text-[#4d7cbf] group-hover:text-white @endif"></i>
                 <span class="relative z-10">Peminjaman</span>
             </a>
 
@@ -52,8 +61,11 @@
                 class="relative overflow-hidden flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all duration-300 group
                 @if (Request::routeIs('barang.index')) bg-[#213c61] text-white shadow-md @else text-slate-600 hover:bg-[#213c61] hover:text-white @endif">
                 <!-- Efek Cahaya (Glow Sweep) -->
-                <div class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 pointer-events-none"></div>
-                <i class="fas fa-boxes w-5 relative z-10 @if (Request::routeIs('barang.index')) text-white @else text-[#4d7cbf] group-hover:text-white @endif"></i>
+                <div
+                    class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 pointer-events-none">
+                </div>
+                <i
+                    class="fas fa-boxes w-5 relative z-10 @if (Request::routeIs('barang.index')) text-white @else text-[#4d7cbf] group-hover:text-white @endif"></i>
                 <span class="relative z-10">Barang</span>
             </a>
 
@@ -62,8 +74,11 @@
                 class="relative overflow-hidden flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all duration-300 group
                 @if (Request::routeIs('keuangan.index')) bg-[#213c61] text-white shadow-md @else text-slate-600 hover:bg-[#213c61] hover:text-white @endif">
                 <!-- Efek Cahaya (Glow Sweep) -->
-                <div class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 pointer-events-none"></div>
-                <i class="fas fa-coins w-5 relative z-10 @if (Request::routeIs('keuangan.index')) text-white @else text-[#4d7cbf] group-hover:text-white @endif"></i>
+                <div
+                    class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 pointer-events-none">
+                </div>
+                <i
+                    class="fas fa-coins w-5 relative z-10 @if (Request::routeIs('keuangan.index')) text-white @else text-[#4d7cbf] group-hover:text-white @endif"></i>
                 <span class="relative z-10">Keuangan</span>
             </a>
         </nav>
@@ -73,7 +88,9 @@
             <button onclick="showPromoModal()"
                 class="relative overflow-hidden w-full flex items-center justify-center gap-2 bg-[#05234f] hover:bg-[#05234f] text-white font-semibold py-2.5 px-4 rounded-xl shadow-md transition-all duration-200 group">
                 <!-- Efek Cahaya pada tombol Promo -->
-                <div class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 pointer-events-none"></div>
+                <div
+                    class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 pointer-events-none">
+                </div>
                 <i class="fas fa-plus-circle relative z-10"></i>
                 <span class="relative z-10">Tambah Promo/Inventaris</span>
             </button>
@@ -102,7 +119,8 @@
             <div class="flex items-center gap-3 sm:gap-4">
                 <!-- Notifications -->
                 <div class="relative cursor-pointer group" onclick="showNotifications()">
-                    <i class="far fa-bell text-slate-400 text-lg sm:text-xl group-hover:text-[#4d7cbf] transition-colors"></i>
+                    <i
+                        class="far fa-bell text-slate-400 text-lg sm:text-xl group-hover:text-[#4d7cbf] transition-colors"></i>
                     <span
                         class="absolute -top-1 -right-1.5 h-2.5 w-2.5 bg-red-500 rounded-full ring-2 ring-white"></span>
                 </div>
@@ -123,7 +141,8 @@
                                 @ {{ Auth::user() ? Auth::user()->username : 'guest' }}
                             </span>
                         </div>
-                        <i class="fas fa-chevron-down text-xs text-slate-400 group-hover:text-[#4d7cbf] transition-colors"></i>
+                        <i
+                            class="fas fa-chevron-down text-xs text-slate-400 group-hover:text-[#4d7cbf] transition-colors"></i>
                     </div>
 
                     <!-- Dropdown Menu -->

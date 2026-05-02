@@ -10,7 +10,7 @@
     <!-- SECTION 1: TOP STATS -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
     <!-- Sewa Aktif -->
-    <div class="group bg-white rounded-[2rem] p-6 border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-indigo-500/10 transition-all duration-300 transform hover:-translate-y-1 cursor-pointer">
+    <div class="group bg-white rounded-4xl p-6 border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-indigo-500/10 transition-all duration-300 transform hover:-translate-y-1 cursor-pointer">
         <div class="flex items-start justify-between">
             <div class="space-y-3">
                 <div class="flex items-center gap-2">
@@ -28,7 +28,7 @@
     </div>
 
     <!-- Income -->
-    <div class="group bg-white rounded-[2rem] p-6 border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-emerald-500/10 transition-all duration-300 transform hover:-translate-y-1 cursor-pointer">
+    <div class="group bg-white rounded-4xl p-6 border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-emerald-500/10 transition-all duration-300 transform hover:-translate-y-1 cursor-pointer">
         <div class="flex items-start justify-between">
             <div class="space-y-3">
                 <div class="flex items-center gap-2">
@@ -46,7 +46,7 @@
     </div>
 
     <!-- Pengeluaran -->
-    <div class="group bg-white rounded-[2rem] p-6 border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-rose-500/10 transition-all duration-300 transform hover:-translate-y-1 cursor-pointer">
+    <div class="group bg-white rounded-4xl p-6 border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-rose-500/10 transition-all duration-300 transform hover:-translate-y-1 cursor-pointer">
         <div class="flex items-start justify-between">
             <div class="space-y-3">
                 <div class="flex items-center gap-2">
@@ -91,7 +91,7 @@
             <div id="calendarGrid" class="grid grid-cols-7 gap-1.5"></div>
 
             <!-- POPUP DETAIL KALENDER (UPDATED) -->
-            <div id="schedulePopup" class="hidden absolute inset-0 z-20 bg-white/98 backdrop-blur-md p-6 flex flex-col animate-fade-in shadow-2xl">
+            <div id="schedulePopup" class="hidden absolute inset-0 z-20 bg-white/98 backdrop-blur-md p-6 flex-col animate-fade-in shadow-2xl">
                 <div class="flex justify-between items-start mb-6">
                     <div>
                         <h4 class="font-black text-lg text-slate-800 uppercase leading-none">Detail Acara</h4>
