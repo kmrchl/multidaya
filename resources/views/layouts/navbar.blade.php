@@ -58,13 +58,11 @@
         </nav>
 
         <!-- Promo Button -->
-        <div class="p-5 border-t border-[#cfe1f4]">
-            <button onclick="showPromoModal()"
-                class="w-full flex items-center justify-center gap-2 bg-[#4d7cbf] hover:bg-[#3d69a6] text-white font-semibold py-2.5 px-4 rounded-xl shadow-md transition-all duration-200">
-                <i class="fas fa-plus-circle"></i>
-                <span>Tambah Promo/Inventaris</span>
-            </button>
-        </div>
+        <a href="{{ route('ai.test') }}"
+            class="w-full flex items-center justify-center gap-2 bg-[#4d7cbf] hover:bg-[#3d69a6] text-white font-semibold py-2.5 px-4 rounded-xl shadow-md transition-all duration-200">
+            <i class="fas fa-plus-circle"></i>
+            <span>Promo / Inventaris AI</span>
+        </a>
     </aside>
 
     <!-- MAIN CONTENT CONTAINER -->

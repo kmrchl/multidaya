@@ -1,16 +1,18 @@
 <?php
 
-namespace App\Http\Controllers;
 
+namespace App\Http\Controllers;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Models\Peminjaman;
 use App\Models\Barang;
 use App\Models\DetailPeminjaman;
 use App\Models\Notification;
 use App\Models\Recommendation;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\DB;
+
 
 class DashboardController extends Controller
 {
@@ -18,45 +20,45 @@ class DashboardController extends Controller
     {
         $greeting = $this->getGreeting();
         $userName = auth()->user()->name ?? 'Admin';
-        
+
         // ==================== STATISTIK DASHBOARD ====================
         // Total pendapatan bulan ini
         $currentMonth = Carbon::now()->month;
         $currentYear = Carbon::now()->year;
-        
+
         $pendapatanBulanIni = Peminjaman::where('status_pengembalian', 'selesai')
             ->whereMonth('tanggal_pengembalian_real', $currentMonth)
             ->whereYear('tanggal_pengembalian_real', $currentYear)
             ->sum('grand_total');
-        
+
         $targetBulanIni = 200000000; // Target misal 200 juta
         $monthlyTarget = $pendapatanBulanIni > 0 ? ($pendapatanBulanIni / $targetBulanIni) * 100 : 0;
-        
+
         // Unread messages (notifikasi belum dibaca)
         $unreadMessages = Notification::where('status', 'unread')->count();
-        
+
         // Revenue growth (perbandingan bulan ini dengan bulan lalu)
         $lastMonth = Carbon::now()->subMonth();
         $pendapatanBulanLalu = Peminjaman::where('status_pengembalian', 'selesai')
             ->whereMonth('tanggal_pengembalian_real', $lastMonth->month)
             ->whereYear('tanggal_pengembalian_real', $lastMonth->year)
             ->sum('grand_total');
-        
-        $revenueGrowth = $pendapatanBulanLalu > 0 
-            ? (($pendapatanBulanIni - $pendapatanBulanLalu) / $pendapatanBulanLalu) * 100 
+
+        $revenueGrowth = $pendapatanBulanLalu > 0
+            ? (($pendapatanBulanIni - $pendapatanBulanLalu) / $pendapatanBulanLalu) * 100
             : 0;
-        
+
         // ==================== AKTIVITAS TERBARU ====================
         $activities = $this->getRecentActivities();
-        
+
         // ==================== TOP PRODUCTS ====================
         $topProducts = $this->getTopProducts();
-        
+
         // ==================== GROWTH DATA ====================
         $monthlySales = $pendapatanBulanIni;
         $monthlyProgress = $monthlyTarget;
         $monthlyGrowth = $revenueGrowth;
-        
+
         // Top month berdasarkan historis
         $topMonth = $this->getTopMonth();
         $topYear = $this->getTopYear();
@@ -64,24 +66,33 @@ class DashboardController extends Controller
             ->whereYear('tanggal_pengembalian_real', $currentYear)
             ->sum('grand_total');
         $yearlyGrowth = $this->getYearlyGrowth();
-        
+
         // ==================== REKOMENDASI PINTAR ====================
         $recommendations = $this->generateSmartRecommendations();
-        
+
         // ==================== NOTIFIKASI ====================
         $notifications = Notification::where('status', 'unread')
             ->orderBy('created_at', 'desc')
             ->limit(5)
             ->get();
-        
+
+        // === Cari 1 barang untuk Optimasi Profit (Contoh: yang stoknya paling banyak/perlu promo) ==
+        $produkProfitAI = Barang::orderBy('stok', 'desc')->first();
+
+        // === Cari 1 barang untuk Analisis Stok (Contoh: yang stoknya paling sedikit/mau habis) ==
+        $produkStokAI = Barang::orderBy('stok', 'asc')->first();
+
+        // ==================== AI REKOMENDASI ====================
+        $produkAnalisisAI = Barang::orderBy('stok', 'asc')->first();
+
         return view('dashboard.index', compact(
             'greeting', 'userName', 'monthlyTarget', 'pendapatanBulanIni',
             'unreadMessages', 'revenueGrowth', 'activities', 'topProducts',
             'monthlySales', 'monthlyProgress', 'monthlyGrowth', 'topMonth',
-            'topYear', 'yearlySales', 'yearlyGrowth', 'recommendations', 'notifications'
+            'topYear', 'yearlySales', 'yearlyGrowth', 'recommendations', 'notifications', 'produkProfitAI', 'produkStokAI'
         ));
     }
-    
+
     private function getGreeting()
     {
         $hour = Carbon::now()->hour;
@@ -89,7 +100,7 @@ class DashboardController extends Controller
         if ($hour < 18) return 'Afternoon';
         return 'Evening';
     }
-    
+
     private function getRecentActivities()
     {
         // Ambil peminjaman terbaru sebagai aktivitas
@@ -97,7 +108,7 @@ class DashboardController extends Controller
             ->orderBy('created_at', 'desc')
             ->limit(5)
             ->get();
-        
+
         $activities = [];
         foreach ($recentPeminjaman as $peminjaman) {
             $activities[] = (object)[
@@ -107,22 +118,22 @@ class DashboardController extends Controller
                 'description' => $peminjaman->invoice_number . ' - ' . ($peminjaman->details->first()->nama_barang ?? 'Barang') . ' oleh ' . $peminjaman->nama_penyewa
             ];
         }
-        
+
         return $activities;
     }
-    
+
     private function getTopProducts()
     {
-        $topBarang = DetailPeminjaman::select('nama_barang', 
+        $topBarang = DetailPeminjaman::select('nama_barang',
             DB::raw('SUM(jumlah) as total_sewa'),
             DB::raw('SUM(subtotal) as total_pendapatan'))
             ->groupBy('nama_barang')
             ->orderBy('total_sewa', 'desc')
             ->limit(5)
             ->get();
-        
+
         $maxTotal = $topBarang->max('total_sewa') ?: 1;
-        
+
         $products = [];
         foreach ($topBarang as $index => $item) {
             $products[] = (object)[
@@ -131,70 +142,68 @@ class DashboardController extends Controller
                 'sales' => $item->total_pendapatan
             ];
         }
-        
+
         return $products;
     }
-    
+
     private function getTopMonth()
     {
         $topMonth = Peminjaman::where('status_pengembalian', 'selesai')
-            ->select(DB::raw('MONTH(tanggal_pengembalian_real) as month'), 
+            ->select(DB::raw('MONTH(tanggal_pengembalian_real) as month'),
                 DB::raw('SUM(grand_total) as total'))
             ->groupBy('month')
             ->orderBy('total', 'desc')
             ->first();
-        
+
         if ($topMonth) {
             return Carbon::create()->month($topMonth->month)->format('F Y');
         }
         return 'November 2024';
     }
-    
+
     private function getTopYear()
     {
         $topYear = Peminjaman::where('status_pengembalian', 'selesai')
-            ->select(DB::raw('YEAR(tanggal_pengembalian_real) as year'), 
+            ->select(DB::raw('YEAR(tanggal_pengembalian_real) as year'),
                 DB::raw('SUM(grand_total) as total'))
             ->groupBy('year')
             ->orderBy('total', 'desc')
             ->first();
-        
+
         return $topYear ? $topYear->year : '2024';
     }
-    
+
     private function getYearlyGrowth()
     {
         $currentYear = Carbon::now()->year;
         $lastYear = $currentYear - 1;
-        
+
         $currentYearTotal = Peminjaman::where('status_pengembalian', 'selesai')
             ->whereYear('tanggal_pengembalian_real', $currentYear)
             ->sum('grand_total');
-        
+
         $lastYearTotal = Peminjaman::where('status_pengembalian', 'selesai')
             ->whereYear('tanggal_pengembalian_real', $lastYear)
             ->sum('grand_total');
-        
+
         if ($lastYearTotal > 0) {
             return round((($currentYearTotal - $lastYearTotal) / $lastYearTotal) * 100);
         }
         return 22;
     }
-    
-    /**
-     * Generate smart recommendations based on ML logic
-     */
+
+    // ==================== REKOMENDASI AI ====================
     private function generateSmartRecommendations()
     {
         $recommendations = [];
-        
+
         // 1. Analisis permintaan barang (terlalu sedikit stok)
         $topRequested = DetailPeminjaman::select('nama_barang', DB::raw('SUM(jumlah) as total_request'))
             ->groupBy('nama_barang')
             ->orderBy('total_request', 'desc')
             ->limit(3)
             ->get();
-        
+
         foreach ($topRequested as $barang) {
             // Cek stok saat ini
             $barangDb = Barang::where('nama_barang', $barang->nama_barang)->first();
@@ -209,11 +218,11 @@ class DashboardController extends Controller
                 ];
             }
         }
-        
+
         // 2. Rekomendasi promo berdasarkan hari/liburan nasional
         $today = Carbon::now();
         $nationalHolidays = $this->getNationalHolidays();
-        
+
         foreach ($nationalHolidays as $holiday) {
             if ($today->diffInDays(Carbon::parse($holiday['date'])) <= 7) {
                 $recommendations[] = (object)[
@@ -226,7 +235,7 @@ class DashboardController extends Controller
                 ];
             }
         }
-        
+
         // 3. Rekomendasi berdasarkan weekend
         if ($today->isFriday()) {
             $recommendations[] = (object)[
@@ -238,12 +247,12 @@ class DashboardController extends Controller
                 'status' => 'pending'
             ];
         }
-        
+
         // 4. Analisis musim ramai/sepi
         $currentMonth = $today->month;
         $busyMonths = [12, 6, 7, 8]; // Desember, Juni, Juli, Agustus
         $slowMonths = [1, 2]; // Januari, Februari
-        
+
         if (in_array($currentMonth, $busyMonths)) {
             $recommendations[] = (object)[
                 'type' => 'promo',
@@ -263,14 +272,14 @@ class DashboardController extends Controller
                 'status' => 'pending'
             ];
         }
-        
+
         // 5. Rekomendasi barang baru berdasarkan minat penyewa
         $customerInterests = DetailPeminjaman::select('nama_barang', DB::raw('COUNT(DISTINCT peminjaman_id) as unique_customers'))
             ->groupBy('nama_barang')
             ->orderBy('unique_customers', 'desc')
             ->limit(3)
             ->get();
-        
+
         foreach ($customerInterests as $interest) {
             $recommendations[] = (object)[
                 'type' => 'barang',
@@ -281,7 +290,7 @@ class DashboardController extends Controller
                 'status' => 'pending'
             ];
         }
-        
+
         // Simpan rekomendasi ke database
         foreach ($recommendations as $rec) {
             Recommendation::updateOrCreate(
@@ -294,10 +303,10 @@ class DashboardController extends Controller
                 ]
             );
         }
-        
+
         return array_slice($recommendations, 0, 3);
     }
-    
+
     private function getNationalHolidays()
     {
         return [
@@ -309,7 +318,7 @@ class DashboardController extends Controller
             ['name' => 'Hari Raya Natal', 'date' => date('Y') . '-12-25'],
         ];
     }
-    
+
     /**
      * Send WhatsApp notification
      */
@@ -319,16 +328,16 @@ class DashboardController extends Controller
             'number' => 'required|string',
             'message' => 'required|string'
         ]);
-        
+
         $number = $request->number;
         $message = $request->message;
-        
+
         // Format nomor WhatsApp (hapus 0 di depan, tambah 62)
         $number = preg_replace('/^0/', '62', $number);
-        
+
         // URL WhatsApp API (gunakan WhatsApp API key Anda)
         // Contoh menggunakan Fonnte atau API lainnya
-        
+
         // Simpan notifikasi
         $notification = Notification::create([
             'title' => 'Notifikasi WhatsApp',
@@ -338,14 +347,14 @@ class DashboardController extends Controller
             'whatsapp_sent' => true,
             'sent_at' => now()
         ]);
-        
+
         return response()->json([
             'success' => true,
             'message' => 'Notifikasi WhatsApp berhasil dikirim',
             'data' => $notification
         ]);
     }
-    
+
     /**
      * Get notifications
      */
@@ -354,14 +363,14 @@ class DashboardController extends Controller
         $notifications = Notification::where('status', 'unread')
             ->orderBy('created_at', 'desc')
             ->get();
-        
+
         return response()->json([
             'success' => true,
             'data' => $notifications,
             'count' => $notifications->count()
         ]);
     }
-    
+
     /**
      * Mark notification as read
      */
@@ -369,13 +378,13 @@ class DashboardController extends Controller
     {
         $notification = Notification::findOrFail($id);
         $notification->update(['status' => 'read']);
-        
+
         return response()->json([
             'success' => true,
             'message' => 'Notifikasi ditandai telah dibaca'
         ]);
     }
-    
+
     /**
      * Get recommendations
      */
@@ -385,13 +394,13 @@ class DashboardController extends Controller
             ->orderBy('score', 'desc')
             ->limit(3)
             ->get();
-        
+
         return response()->json([
             'success' => true,
             'data' => $recommendations
         ]);
     }
-    
+
     /**
      * Accept recommendation
      */
@@ -399,17 +408,84 @@ class DashboardController extends Controller
     {
         $recommendation = Recommendation::findOrFail($id);
         $recommendation->update(['status' => 'approved']);
-        
+
         // Tambahkan notifikasi
         Notification::create([
             'title' => 'Rekomendasi Diterima',
             'message' => 'Rekomendasi "' . $recommendation->title . '" telah diterima',
             'type' => 'success'
         ]);
-        
+
         return response()->json([
             'success' => true,
             'message' => 'Rekomendasi diterima'
         ]);
     }
+
+
+    public function getAiOptimization($id)
+    {
+        // 🔹 1. Ambil data barang
+        $barang = Barang::find($id);
+
+        if (!$barang) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Barang tidak ditemukan'
+            ], 404);
+        }
+
+        try {
+            // 🔹 2. Hitung permintaan (dari transaksi)
+            $permintaan = DetailPeminjaman::where('nama_barang', $barang->nama_barang)->count();
+
+            // fallback biar ga nol
+            $durasi = $permintaan > 0 ? $permintaan : 1;
+
+            // 🔹 3. Payload ke AI Flask
+            $payload = [
+                'nama_barang'   => $barang->nama_barang,
+                'durasi_sewa'   => $durasi,
+                'stok_saat_itu' => (int) $barang->stok,
+                'bulan'         => (int) date('n'),
+                'hari'          => date('l'),
+            ];
+
+            // DEBUG (opsional tapi penting)
+            Log::info('Payload ke AI:', $payload);
+
+            // 🔹 4. Call Flask
+            $response = Http::timeout(10)->post('http://127.0.0.1:5000/predict', $payload);
+
+            // 🔹 5. Handle response AI
+            if ($response->successful()) {
+                $result = $response->json();
+
+                return response()->json([
+                    'status' => 'success',
+                    'barang' => $barang->nama_barang,
+                    'stok'   => $barang->stok,
+                    'harga_prediksi' => $result['harga_prediksi'] ?? 0,
+                    'rekomendasi'    => $result['rekomendasi'] ?? '-'
+                ]);
+            }
+
+            // kalau AI ga respon valid
+            return response()->json([
+                'status' => 'error',
+                'message' => 'AI tidak memberikan response valid'
+            ], 500);
+
+        } catch (\Exception $e) {
+
+            Log::error('AI ERROR: ' . $e->getMessage());
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Gagal terhubung ke AI server',
+                'detail'  => $e->getMessage()
+            ], 500);
+        }
+    }
 }
+

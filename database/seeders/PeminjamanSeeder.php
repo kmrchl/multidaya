@@ -15,14 +15,14 @@ class PeminjamanSeeder extends Seeder
     {
         // Nonaktifkan foreign key checks
         Schema::disableForeignKeyConstraints();
-        
+
         // Kosongkan tabel detail_peminjaman dan peminjaman
         DB::table('detail_peminjaman')->truncate();
         DB::table('peminjaman')->truncate();
-        
+
         // Aktifkan kembali foreign key checks
         Schema::enableForeignKeyConstraints();
-        
+
         // Data peminjaman dari Januari - April 2026
         $peminjamanData = [
             // ==================== JANUARI 2026 ====================
@@ -106,7 +106,7 @@ class PeminjamanSeeder extends Seeder
                     ['kode_barang' => 'KBL004', 'jumlah' => 4]
                 ]
             ],
-            
+
             // ==================== FEBRUARI 2026 ====================
             [
                 'invoice_number' => 'INV/MIP/2026/02/0001',
@@ -189,7 +189,7 @@ class PeminjamanSeeder extends Seeder
                     ['kode_barang' => 'KBL001', 'jumlah' => 2]
                 ]
             ],
-            
+
             // ==================== MARET 2026 ====================
             [
                 'invoice_number' => 'INV/MIP/2026/03/0001',
@@ -270,7 +270,7 @@ class PeminjamanSeeder extends Seeder
                     ['kode_barang' => 'SCR001', 'jumlah' => 1]
                 ]
             ],
-            
+
             // ==================== APRIL 2026 ====================
             [
                 'invoice_number' => 'INV/MIP/2026/04/0001',
@@ -435,28 +435,28 @@ class PeminjamanSeeder extends Seeder
                 ]
             ]
         ];
-        
+
         // Helper function untuk get barang id by kode
         $getBarangId = function($kode) {
             return Barang::where('kode_barang', $kode)->value('id');
         };
-        
+
         $totalPeminjaman = 0;
-        
+
         foreach ($peminjamanData as $data) {
             $details = $data['detail'];
             unset($data['detail']);
-            
+
             // Create peminjaman
             $peminjaman = Peminjaman::create($data);
             $totalPeminjaman++;
-            
+
             // Create detail peminjaman
             foreach ($details as $detail) {
                 $barangId = $getBarangId($detail['kode_barang']);
                 if ($barangId) {
                     $barang = Barang::find($barangId);
-                    
+
                     DetailPeminjaman::create([
                         'peminjaman_id' => $peminjaman->id,
                         'barang_id' => $barangId,
@@ -466,7 +466,7 @@ class PeminjamanSeeder extends Seeder
                         'jumlah' => $detail['jumlah'],
                         'subtotal' => $barang->harga_sewa * $detail['jumlah']
                     ]);
-                    
+
                     // Update stok barang untuk peminjaman aktif/terlambat
                     if ($peminjaman->status_pengembalian == 'aktif' || $peminjaman->status_pengembalian == 'terlambat') {
                         $barang->decrement('tersedia', $detail['jumlah']);
@@ -475,7 +475,7 @@ class PeminjamanSeeder extends Seeder
                 }
             }
         }
-        
+
         $this->command->info('✅ Peminjaman seeded successfully!');
         $this->command->info('📊 Total: ' . $totalPeminjaman . ' peminjaman');
         $this->command->info('   - Januari 2026: 3 peminjaman');

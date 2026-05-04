@@ -7,6 +7,11 @@ use App\Http\Controllers\PeminjamanController;
 use App\Http\Controllers\BarangController;
 use App\Http\Controllers\KeuanganController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\RekomendasiController;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\AITestController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -98,5 +103,25 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/recommendations', [DashboardController::class, 'getRecommendations'])->name('recommendations');
     Route::post('/recommendations/accept', [DashboardController::class, 'acceptRecommendation'])->name('recommendations.accept');
     Route::get('/recommendations/refresh', [DashboardController::class, 'refreshRecommendations'])->name('recommendations.refresh');
+    Route::get('/dashboard/ai-optimization/{id}', [DashboardController::class, 'getAiOptimization']);
 });
 
+
+
+// Halaman form input
+Route::get('/rekomendasi', function () {
+    return view('form_rekomendasi');
+});
+
+// Proses kirim ke AI
+Route::get('/dashboard/ai-optimization/{id}', [DashboardController::class, 'getAiOptimization']);
+
+Route::get('/ai-test', [AITestController::class, 'index']);
+
+Route::get('/ai-test', [AITestController::class, 'page']);
+Route::get('/api/ai/auto-discount', [AITestController::class, 'runAIAuto']);
+
+// Route::get('/ai-test/restock/{id}', [AITestController::class, 'runAIStock']);
+// Route::get('/rekomendasi-barang', [AITestController::class, 'runRekomendasiBarang']);
+Route::get('/api/ai/rekomendasi-barang', [AITestController::class, 'runRekomendasiBarang']);
+Route::get('/ai-test', [AITestController::class, 'page'])->name('ai.test');

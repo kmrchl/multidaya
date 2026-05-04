@@ -17,20 +17,20 @@ class KeuanganController extends Controller
         // Get current month and year
         $bulan = $request->bulan ?? date('m');
         $tahun = $request->tahun ?? date('Y');
-        
+
         // ==================== PENDAPATAN DARI PEMINJAMAN (SEWA) ====================
         // Ambil semua peminjaman yang sudah selesai di bulan ini untuk pendapatan
         $peminjamanSelesai = Peminjaman::where('status_pengembalian', 'selesai')
             ->whereMonth('tanggal_pengembalian_real', $bulan)
             ->whereYear('tanggal_pengembalian_real', $tahun)
             ->get();
-        
+
         // Sinkronisasi ke tabel keuangan untuk pendapatan sewa
         foreach ($peminjamanSelesai as $peminjaman) {
             $exists = Keuangan::where('peminjaman_id', $peminjaman->id)
                 ->where('sumber', 'sewa')
                 ->exists();
-            
+
             if (!$exists) {
                 Keuangan::create([
                     'peminjaman_id' => $peminjaman->id,
@@ -46,49 +46,49 @@ class KeuanganController extends Controller
                 ]);
             }
         }
-        
+
         // ==================== PENGELUARAN (Operasional, Promosi, Inventaris) ====================
         $pengeluaran = Keuangan::pengeluaran()
             ->whereMonth('tanggal', $bulan)
             ->whereYear('tanggal', $tahun)
             ->get();
-        
+
         // Calculate totals
         $totalPendapatan = Keuangan::pendapatan()->dariSewa()
             ->whereMonth('tanggal', $bulan)
             ->whereYear('tanggal', $tahun)
             ->sum('jumlah');
-        
+
         $totalPengeluaran = $pengeluaran->sum('jumlah');
         $labaBersih = $totalPendapatan - $totalPengeluaran;
-        
+
         // Get previous month data
         $previousMonth = date('m', strtotime("-1 month", strtotime("$tahun-$bulan-01")));
         $previousYear = $bulan == 1 ? $tahun - 1 : $tahun;
-        
+
         $previousPendapatan = Keuangan::pendapatan()->dariSewa()
             ->whereMonth('tanggal', $previousMonth)
             ->whereYear('tanggal', $previousYear)
             ->sum('jumlah');
-        
+
         $previousPengeluaran = Keuangan::pengeluaran()
             ->whereMonth('tanggal', $previousMonth)
             ->whereYear('tanggal', $previousYear)
             ->sum('jumlah');
-        
+
         // Calculate growth percentages
-        $pendapatanGrowth = $previousPendapatan > 0 
-            ? (($totalPendapatan - $previousPendapatan) / $previousPendapatan) * 100 
+        $pendapatanGrowth = $previousPendapatan > 0
+            ? (($totalPendapatan - $previousPendapatan) / $previousPendapatan) * 100
             : 0;
-        
-        $pengeluaranGrowth = $previousPengeluaran > 0 
-            ? (($totalPengeluaran - $previousPengeluaran) / $previousPengeluaran) * 100 
+
+        $pengeluaranGrowth = $previousPengeluaran > 0
+            ? (($totalPengeluaran - $previousPengeluaran) / $previousPengeluaran) * 100
             : 0;
-        
+
         $labaGrowth = ($previousPendapatan - $previousPengeluaran) > 0
             ? (($labaBersih - ($previousPendapatan - $previousPengeluaran)) / ($previousPendapatan - $previousPengeluaran)) * 100
             : 0;
-        
+
         // Get monthly data for chart
         $monthlyData = [];
         for ($i = 1; $i <= 12; $i++) {
@@ -96,19 +96,19 @@ class KeuanganController extends Controller
                 ->whereMonth('tanggal', $i)
                 ->whereYear('tanggal', $tahun)
                 ->sum('jumlah');
-            
+
             $monthlyPengeluaran = Keuangan::pengeluaran()
                 ->whereMonth('tanggal', $i)
                 ->whereYear('tanggal', $tahun)
                 ->sum('jumlah');
-            
+
             $monthlyData[] = [
                 'bulan' => date('M', mktime(0, 0, 0, $i, 1)),
                 'pendapatan' => $monthlyPendapatan,
                 'pengeluaran' => $monthlyPengeluaran
             ];
         }
-        
+
         // Get top performing barang
         $topBarang = DetailPeminjaman::select('nama_barang', DB::raw('SUM(jumlah) as total_sewa'))
             ->whereYear('created_at', $tahun)
@@ -116,7 +116,7 @@ class KeuanganController extends Controller
             ->orderBy('total_sewa', 'desc')
             ->limit(5)
             ->get();
-        
+
         // Get pengeluaran by kategori
         $pengeluaranByKategori = Keuangan::pengeluaran()
             ->select('sumber', 'kategori', DB::raw('SUM(jumlah) as total'))
@@ -124,12 +124,12 @@ class KeuanganController extends Controller
             ->whereYear('tanggal', $tahun)
             ->groupBy('sumber', 'kategori')
             ->get();
-        
+
         // Get transaksi terbaru
         $recentTransactions = Keuangan::orderBy('tanggal', 'desc')
             ->limit(10)
             ->get();
-        
+
         return view('keuangan.index', compact(
             'totalPendapatan', 'totalPengeluaran', 'labaBersih',
             'pendapatanGrowth', 'pengeluaranGrowth', 'labaGrowth',
@@ -148,7 +148,7 @@ class KeuanganController extends Controller
             'tanggal' => 'required|date',
             'keterangan' => 'nullable|string'
         ]);
-        
+
         DB::beginTransaction();
         try {
             $keuangan = Keuangan::create([
@@ -163,9 +163,9 @@ class KeuanganController extends Controller
                 'keterangan' => $request->keterangan,
                 'created_by' => Auth::id()
             ]);
-            
+
             DB::commit();
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Biaya berhasil ditambahkan',
@@ -183,12 +183,12 @@ class KeuanganController extends Controller
     public function destroy($id)
     {
         $keuangan = Keuangan::findOrFail($id);
-        
+
         DB::beginTransaction();
         try {
             $keuangan->delete();
             DB::commit();
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Transaksi berhasil dihapus'
@@ -209,45 +209,45 @@ class KeuanganController extends Controller
     {
         $startDate = $request->start ? date('Y-m-d', strtotime($request->start . '-01')) : date('Y-m-01');
         $endDate = $request->end ? date('Y-m-t', strtotime($request->end . '-01')) : date('Y-m-t');
-        
+
         // Pendapatan dari peminjaman selesai
         $pendapatanUsaha = Peminjaman::where('status_pengembalian', 'selesai')
             ->whereBetween('tanggal_pengembalian_real', [$startDate, $endDate])
             ->sum('grand_total');
-        
+
         // HPP (Harga Pokok Penjualan) dari barang
         $hpp = DetailPeminjaman::whereBetween('created_at', [$startDate, $endDate])
             ->sum('subtotal');
-        
+
         // Pembelian inventaris baru
         $pembelian = Keuangan::pengeluaran()
             ->dariInventaris()
             ->whereBetween('tanggal', [$startDate, $endDate])
             ->sum('jumlah');
-        
+
         // Biaya operasional
         $biayaOperasional = Keuangan::pengeluaran()
             ->dariOperasional()
             ->whereBetween('tanggal', [$startDate, $endDate])
             ->sum('jumlah');
-        
+
         // Pendapatan lain (promosi/saldo)
         $pendapatanLain = Keuangan::pendapatan()
             ->where('sumber', 'promosi')
             ->whereBetween('tanggal', [$startDate, $endDate])
             ->sum('jumlah');
-        
+
         // Biaya lain
         $biayaLain = Keuangan::pengeluaran()
             ->dariPromosi()
             ->whereBetween('tanggal', [$startDate, $endDate])
             ->sum('jumlah');
-        
+
         $labaKotor = $pendapatanUsaha - ($hpp + $pembelian);
         $totalPendapatanUsaha = $labaKotor - $biayaOperasional;
         $totalPendapatanLuar = $pendapatanLain - $biayaLain;
         $labaRugiBersih = $totalPendapatanUsaha + $totalPendapatanLuar;
-        
+
         if ($request->ajax()) {
             return response()->json([
                 'success' => true,
@@ -265,7 +265,7 @@ class KeuanganController extends Controller
                 'end_date' => $endDate
             ]);
         }
-        
+
         return view('keuangan.laporan_laba_rugi');
     }
 }
