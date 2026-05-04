@@ -2,7 +2,6 @@
 
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PeminjamanController;
 use App\Http\Controllers\BarangController;
 use App\Http\Controllers\KeuanganController;
@@ -13,6 +12,10 @@ use Illuminate\Support\Facades\Route;
 | Web Routes
 |--------------------------------------------------------------------------
 */
+
+Route::get('/test', function () {
+    return response()->json(['message' => 'OK']);
+});
 
 Route::get('/', function () {
     return redirect()->route('dashboard');
@@ -54,10 +57,15 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/{id}/send-pengiriman', [PeminjamanController::class, 'sendPengirimanNotification'])->name('send-pengiriman');
         Route::post('/{id}/send-pengingat', [PeminjamanController::class, 'sendPengingatPengembalian'])->name('send-pengingat');
 
-        // Customer Check Routes 
+        // Customer Check Routes (CEK PELANGGAN) - Letakkan di DALAM group
         Route::post('/cek-pelanggan', [PeminjamanController::class, 'cekPelanggan'])->name('cek-pelanggan');
         Route::get('/pelanggan-list', [PeminjamanController::class, 'getPelangganList'])->name('pelanggan-list');
     });
+
+    // ==================== API ROUTES UNTUK CEK PELANGGAN (DI LUAR GROUP) ====================
+    // Atau pakai prefix api
+    Route::get('/api/pelanggan/list', [PeminjamanController::class, 'getPelangganList'])->name('api.pelanggan.list');
+    Route::post('/api/pelanggan/cek', [PeminjamanController::class, 'cekPelanggan'])->name('api.pelanggan.cek');
 
     // ==================== BARANG ROUTES ====================
     Route::prefix('barang')->name('barang.')->group(function () {
