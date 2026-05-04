@@ -244,11 +244,6 @@
                                     class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all font-semibold">
                             </div>
                             <div class="md:col-span-2">
-                                <label class="block text-xs font-bold text-slate-500 mb-2 ml-1">Email (Opsional)</label>
-                                <input type="email" name="email" id="email"
-                                    class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all font-semibold">
-                            </div>
-                            <div class="md:col-span-2">
                                 <label class="block text-xs font-bold text-slate-500 mb-2 ml-1">Alamat Lengkap</label>
                                 <textarea name="alamat" id="alamat" rows="2"
                                     class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all font-semibold"></textarea>
@@ -426,52 +421,54 @@
                         </div>
                     </div>
 
-                    {{-- Section 6: PPN & Jatuh Tempo --}}
-                    <div class="mb-4 bg-gradient-to-r from-emerald-800 to-teal-800 rounded-3xl p-6 text-white shadow-xl">
+
+                    <!-- Section 6: PPN & Jatuh Tempo -->
+                    <div class="mb-4 bg-white rounded-3xl p-6 shadow-xl border border-gray-200">
                         <div class="flex items-center gap-3 mb-4">
-                            <i class="fas fa-calculator text-lg"></i>
-                            <span class="text-xs font-black uppercase tracking-widest">Perhitungan PPN & Jatuh Tempo</span>
+                            <i class="fas fa-calculator text-lg text-gray-700"></i>
+                            <span class="text-xs font-black uppercase tracking-widest text-gray-700">Perhitungan PPN &
+                                Jatuh Tempo</span>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
                             <div>
-                                <label class="block text-[10px] font-bold text-emerald-200 mb-1 uppercase">PPN (%)</label>
+                                <label class="block text-[10px] font-bold text-gray-500 mb-1 uppercase">PPN (%)</label>
                                 <input type="number" id="ppn_persen" value="11" readonly
-                                    class="w-full px-4 py-2.5 bg-emerald-900/50 border border-emerald-700 rounded-xl text-sm font-bold text-white cursor-not-allowed">
+                                    class="w-full px-4 py-2.5 bg-gray-100 border border-gray-300 rounded-xl text-sm font-bold text-gray-800 cursor-not-allowed">
                             </div>
                             <div>
-                                <label class="block text-[10px] font-bold text-emerald-200 mb-1 uppercase">Total PPN
+                                <label class="block text-[10px] font-bold text-gray-500 mb-1 uppercase">Total PPN
                                     (Rp)</label>
                                 <div class="relative">
                                     <span
-                                        class="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-300 font-bold text-sm">Rp</span>
+                                        class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-bold text-sm">Rp</span>
                                     <input type="text" id="total_ppn_display" value="0" readonly
-                                        class="w-full pl-12 pr-4 py-2.5 bg-emerald-900/50 border border-emerald-700 rounded-xl text-sm font-bold text-white cursor-not-allowed">
+                                        class="w-full pl-12 pr-4 py-2.5 bg-gray-100 border border-gray-300 rounded-xl text-sm font-bold text-gray-800 cursor-not-allowed">
                                     <input type="hidden" id="total_ppn" name="total_ppn" value="0">
                                 </div>
                             </div>
                             <div>
-                                <label class="block text-[10px] font-bold text-emerald-200 mb-1 uppercase">Grand Total +
+                                <label class="block text-[10px] font-bold text-gray-500 mb-1 uppercase">Grand Total +
                                     PPN</label>
                                 <div class="relative">
                                     <span
-                                        class="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-300 font-bold text-sm">Rp</span>
+                                        class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-bold text-sm">Rp</span>
                                     <input type="text" id="grand_total_with_ppn_display" value="0" readonly
-                                        class="w-full pl-12 pr-4 py-2.5 bg-emerald-900/50 border border-emerald-700 rounded-xl text-sm font-bold text-white cursor-not-allowed">
+                                        class="w-full pl-12 pr-4 py-2.5 bg-gray-100 border border-gray-300 rounded-xl text-sm font-bold text-gray-800 cursor-not-allowed">
                                     <input type="hidden" id="grand_total_with_ppn" name="grand_total_with_ppn"
                                         value="0">
                                 </div>
                             </div>
                         </div>
-                        <div class="mt-4 pt-3 border-t border-emerald-700/50">
+                        <div class="mt-4 pt-3 border-t border-gray-200">
                             <div class="flex justify-between items-center">
-                                <span class="text-[10px] font-bold text-emerald-200 uppercase tracking-wider">Jatuh Tempo
+                                <span class="text-[10px] font-bold text-gray-600 uppercase tracking-wider">Jatuh Tempo
                                     Pembayaran</span>
                                 <div class="flex items-center gap-3">
-                                    <i class="fas fa-calendar-alt text-emerald-300"></i>
+                                    <i class="fas fa-calendar-alt text-gray-400"></i>
                                     <input type="date" id="jatuh_tempo_pembayaran" name="jatuh_tempo_pembayaran"
                                         readonly
-                                        class="bg-emerald-900/50 border border-emerald-700 rounded-lg px-3 py-1.5 text-sm font-semibold text-white cursor-not-allowed">
-                                    <span class="text-[10px] text-emerald-300">(H+7 dari tanggal sewa)</span>
+                                        class="bg-gray-100 border border-gray-300 rounded-lg px-3 py-1.5 text-sm font-semibold text-gray-700 cursor-not-allowed">
+                                    <span class="text-[10px] text-gray-400">(H+7 dari tanggal sewa)</span>
                                 </div>
                             </div>
                         </div>
@@ -1410,10 +1407,10 @@
                         ${isAktif ? `<button onclick="openEditModal(${item.id})" class="text-orange-600 hover:text-orange-800 p-1" title="Edit"><i class="fas fa-edit text-sm"></i></button>` : ''}
                         <button onclick="printInvoice(${item.id})" class="text-gray-600 hover:text-gray-800 p-1" title="Invoice"><i class="fas fa-print text-sm"></i></button>
                         ${isAktif ? `
-                                <button onclick="openPengembalianModal(${item.id})" class="text-green-600 hover:text-green-800 p-1" title="Pengembalian"><i class="fas fa-undo-alt text-sm"></i></button>
-                                <button onclick="sendPengirimanNotif(${item.id})" class="text-purple-600 hover:text-purple-800 p-1" title="Kirim WhatsApp"><i class="fab fa-whatsapp text-sm"></i></button>
-                                <button onclick="sendPengingatNotif(${item.id})" class="text-yellow-600 hover:text-yellow-800 p-1" title="Pengingat"><i class="fas fa-bell text-sm"></i></button>
-                            ` : ''}
+                                    <button onclick="openPengembalianModal(${item.id})" class="text-green-600 hover:text-green-800 p-1" title="Pengembalian"><i class="fas fa-undo-alt text-sm"></i></button>
+                                    <button onclick="sendPengirimanNotif(${item.id})" class="text-purple-600 hover:text-purple-800 p-1" title="Kirim WhatsApp"><i class="fab fa-whatsapp text-sm"></i></button>
+                                    <button onclick="sendPengingatNotif(${item.id})" class="text-yellow-600 hover:text-yellow-800 p-1" title="Pengingat"><i class="fas fa-bell text-sm"></i></button>
+                                ` : ''}
                         <button onclick="deleteData(${item.id})" class="text-red-600 hover:text-red-800 p-1" title="Hapus"><i class="fas fa-trash text-sm"></i></button>
                     </div></td>
                 </tr>`;
@@ -1444,7 +1441,7 @@
             if (end < last) {
                 if (end < last - 1) html += '<span class="px-2">...</span>';
                 html +=
-                `<button onclick="changePage(${last})" class="px-3 py-1 text-sm rounded-lg border">${last}</button>`;
+                    `<button onclick="changePage(${last})" class="px-3 py-1 text-sm rounded-lg border">${last}</button>`;
             }
             html += '</div>';
             container.innerHTML = html;
