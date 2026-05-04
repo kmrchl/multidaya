@@ -277,9 +277,6 @@
                     <button onclick="filterRiwayat()"
                         class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition"><i
                             class="fas fa-search"></i> Filter</button>
-                    <button onclick="exportRiwayat()"
-                        class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition"><i
-                            class="fas fa-download"></i> Export Excel</button>
                 </div>
             </div>
 
@@ -294,7 +291,6 @@
                             <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase">Deskripsi</th>
                             <th class="px-4 py-3 text-right text-xs font-semibold text-slate-500 uppercase">Jumlah</th>
                             <th class="px-4 py-3 text-center text-xs font-semibold text-slate-500 uppercase">Referensi</th>
-                            <th class="px-4 py-3 text-center text-xs font-semibold text-slate-500 uppercase">Status</th>
                             <th class="px-4 py-3 text-center text-xs font-semibold text-slate-500 uppercase">Aksi</th>
                         </tr>
                     </thead>
@@ -325,12 +321,9 @@
                                 <td class="px-4 py-3 text-sm text-slate-500 text-center">{{ $biaya->referensi ?? '-' }}
                                 </td>
                                 <td class="px-4 py-3 text-center"><span
-                                        class="bg-green-100 text-green-600 text-xs px-2 py-1 rounded-full">✅
-                                        Disetujui</span></td>
+                            
                                 <td class="px-4 py-3 text-center">
-                                    <button onclick="viewBiayaDetail({{ $biaya->id }})"
-                                        class="text-blue-600 hover:text-blue-800 p-1"><i
-                                            class="fas fa-eye text-sm"></i></button>
+                                    <button onclick="viewBiayaDetail({{ $biaya->id }})""><i
                                     <button onclick="deleteBiaya({{ $biaya->id }})"
                                         class="text-red-600 hover:text-red-800 p-1"><i
                                             class="fas fa-trash text-sm"></i></button>
