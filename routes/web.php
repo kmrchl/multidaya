@@ -80,10 +80,14 @@ Route::middleware(['auth'])->group(function () {
     });
 
     // ==================== KEUANGAN ROUTES ====================
+
     Route::prefix('keuangan')->name('keuangan.')->group(function () {
         Route::get('/', [KeuanganController::class, 'index'])->name('index');
         Route::post('/', [KeuanganController::class, 'store'])->name('store');
         Route::delete('/{id}', [KeuanganController::class, 'destroy'])->name('destroy');
+        Route::get('/{id}', [KeuanganController::class, 'show'])->name('show');
+        Route::get('/riwayat-json', [KeuanganController::class, 'getRiwayatByDate'])->name('riwayat.json');
+        Route::get('/export', [KeuanganController::class, 'export'])->name('export');
         Route::get('/laporan-lab-rugi', [KeuanganController::class, 'laporanLabaRugi'])->name('laporan-lab-rugi');
     });
 
