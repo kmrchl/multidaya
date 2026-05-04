@@ -168,6 +168,14 @@ class PeminjamanController extends Controller
 
             $grandTotal = $totalHarga - ($request->diskon ?? 0);
 
+            // === FITUR BARU: Hitung PPN 11% ===
+            $ppn = 0.11; // 11%
+            $totalPpn = $grandTotal * $ppn;
+            $grandTotalWithPpn = $grandTotal + $totalPpn;
+
+            // === FITUR BARU: Hitung Jatuh Tempo (tanggal sewa + 7 hari) ===
+            $jatuhTempo = date('Y-m-d', strtotime($request->tanggal_sewa . ' +7 days'));
+
             $peminjaman = Peminjaman::create([
                 'invoice_number' => Peminjaman::generateInvoiceNumber(),
                 'pelanggan_id' => $pelanggan->id,
@@ -185,12 +193,17 @@ class PeminjamanController extends Controller
                 'total_harga' => $totalHarga,
                 'diskon' => $request->diskon ?? 0,
                 'grand_total' => $grandTotal,
+                // === FITUR BARU ===
+                'ppn' => $ppn,
+                'total_ppn' => $totalPpn,
+                'grand_total_with_ppn' => $grandTotalWithPpn,
+                'jatuh_tempo_pembayaran' => $jatuhTempo,
                 'keterangan' => $request->keterangan,
                 'created_by' => Auth::id()
             ]);
 
             $pelanggan->increment('total_transaksi');
-            $pelanggan->increment('total_nilai_transaksi', $grandTotal);
+            $pelanggan->increment('total_nilai_transaksi', $grandTotalWithPpn);
 
             foreach ($details as $detail) {
                 $detail['peminjaman_id'] = $peminjaman->id;
@@ -232,6 +245,12 @@ class PeminjamanController extends Controller
         $data = $peminjaman->toArray();
         $data['tanggal_sewa'] = date('Y-m-d', strtotime($peminjaman->tanggal_sewa));
         $data['tanggal_kembali'] = date('Y-m-d', strtotime($peminjaman->tanggal_kembali));
+
+        // Pastikan field baru tersedia
+        $data['ppn'] = $peminjaman->ppn ?? 0.11;
+        $data['total_ppn'] = $peminjaman->total_ppn ?? 0;
+        $data['grand_total_with_ppn'] = $peminjaman->grand_total_with_ppn ?? $peminjaman->grand_total;
+        $data['jatuh_tempo_pembayaran'] = $peminjaman->jatuh_tempo_pembayaran;
 
         return response()->json([
             'success' => true,
@@ -450,6 +469,14 @@ class PeminjamanController extends Controller
 
             $grandTotal = $totalHarga - ($request->diskon ?? 0);
 
+            // === FITUR BARU: Hitung PPN 11% ===
+            $ppn = 0.11; // 11%
+            $totalPpn = $grandTotal * $ppn;
+            $grandTotalWithPpn = $grandTotal + $totalPpn;
+
+            // === FITUR BARU: Hitung Jatuh Tempo (tanggal sewa + 7 hari) ===
+            $jatuhTempo = date('Y-m-d', strtotime($request->tanggal_sewa . ' +7 days'));
+
             $peminjaman->update([
                 'nama_penyewa' => $request->nama_penyewa,
                 'no_telepon' => $request->no_telepon,
@@ -464,6 +491,11 @@ class PeminjamanController extends Controller
                 'total_harga' => $totalHarga,
                 'diskon' => $request->diskon ?? 0,
                 'grand_total' => $grandTotal,
+                // === FITUR BARU ===
+                'ppn' => $ppn,
+                'total_ppn' => $totalPpn,
+                'grand_total_with_ppn' => $grandTotalWithPpn,
+                'jatuh_tempo_pembayaran' => $jatuhTempo,
                 'keterangan' => $request->keterangan
             ]);
 

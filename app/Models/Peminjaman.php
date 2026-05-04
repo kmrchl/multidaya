@@ -43,7 +43,11 @@ class Peminjaman extends Model
         'whatsapp_sent_pengiriman',
         'whatsapp_sent_pengingat',
         'whatsapp_pengingat_sent_at',
-        'created_by'
+        'created_by',
+        'ppn',
+        'total_ppn',
+        'grand_total_with_ppn',
+        'jatuh_tempo_pembayaran',
     ];
 
     protected $casts = [
@@ -61,7 +65,7 @@ class Peminjaman extends Model
         'whatsapp_sent_pengingat' => 'boolean',
         'whatsapp_pengingat_sent_at' => 'datetime',
         'created_at' => 'datetime',
-        'updated_at' => 'datetime'
+        'updated_at' => 'datetime',
     ];
 
     public function details(): HasMany
@@ -134,7 +138,7 @@ class Peminjaman extends Model
         return (float)($this->grand_total + ($this->denda ?? 0));
     }
 
-    // Scopes dengan type hint Builder
+    // Scopes
     public function scopeAktif(Builder $query): Builder
     {
         return $query->where('status_pengembalian', 'aktif');

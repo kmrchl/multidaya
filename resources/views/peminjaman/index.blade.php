@@ -25,7 +25,7 @@
                         class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700">
                     </div>
                     <i class="fas fa-plus-circle text-xs group-hover:rotate-90 transition-transform duration-300"></i>
-                    <span>Tambah Data</span>
+                    <span>Tambah Transaksi</span>
                 </button>
             </div>
         </div>
@@ -54,11 +54,9 @@
         {{-- Filter Section --}}
         <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-5 sm:p-6 mb-8 transition-all hover:shadow-md">
             <div class="flex flex-col md:flex-row items-end gap-5">
-                {{-- Search Input --}}
                 <div class="flex-1 w-full">
-                    <label class="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">
-                        Pencarian Data
-                    </label>
+                    <label class="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Pencarian
+                        Data</label>
                     <div class="relative group">
                         <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                             <i
@@ -69,11 +67,9 @@
                     </div>
                 </div>
 
-                {{-- Sort Select --}}
                 <div class="w-full md:w-64">
-                    <label class="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">
-                        Urutan Tampilan
-                    </label>
+                    <label class="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Urutan
+                        Tampilan</label>
                     <div class="relative group">
                         <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                             <i
@@ -94,11 +90,9 @@
                     </div>
                 </div>
 
-                {{-- Filter Pelanggan --}}
                 <div class="w-full md:w-48">
-                    <label class="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">
-                        Tipe Pelanggan
-                    </label>
+                    <label class="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Tipe
+                        Pelanggan</label>
                     <select id="filterPelanggan"
                         class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 focus:bg-white transition-all appearance-none cursor-pointer">
                         <option value="all">Semua Pelanggan</option>
@@ -116,7 +110,7 @@
                     <thead>
                         <tr class="bg-slate-50/50">
                             <th
-                                class="px-6 py-4 text-left text-[11px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 ">
+                                class="px-6 py-4 text-left text-[11px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">
                                 ID/Invoice</th>
                             <th
                                 class="px-6 py-4 text-left text-[11px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">
@@ -166,7 +160,6 @@
         onclick="if(event.target===this) closeTambahModal()">
         <div
             class="bg-white rounded-3xl shadow-2xl max-w-4xl w-full max-h-[92vh] flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200">
-            {{-- Header --}}
             <div class="px-8 py-5 border-b border-slate-100 flex justify-between items-center bg-white sticky top-0 z-10">
                 <div>
                     <h3 class="text-xl font-extrabold text-slate-800 flex items-center gap-2">
@@ -185,7 +178,6 @@
             </div>
 
             <div class="overflow-y-auto custom-scrollbar">
-                {{-- Cek Pelanggan Button --}}
                 <div class="px-8 pt-6">
                     <button onclick="openCekPelangganModal()" type="button"
                         class="group w-full border-2 border-dashed border-slate-200 bg-slate-50 hover:bg-indigo-50 hover:border-indigo-300 text-slate-500 hover:text-indigo-600 py-3.5 rounded-2xl transition-all flex items-center justify-center gap-3">
@@ -203,9 +195,18 @@
                     </div>
                 </div>
 
-                <form id="formPeminjaman" class="px-8 pb-8">
+                <form id="formPeminjaman" class="px-8 pb-8" enctype="multipart/form-data">
                     @csrf
                     <input type="hidden" id="pelanggan_id" name="pelanggan_id">
+
+                    {{-- Info Pelanggan Baru --}}
+                    <div id="newCustomerInfo" class="hidden mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-xl">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-star text-yellow-500"></i>
+                            <span class="text-sm font-semibold text-yellow-700">Pelanggan Baru!</span>
+                            <span class="text-xs text-yellow-600">Data akan disimpan sebagai pelanggan baru</span>
+                        </div>
+                    </div>
 
                     {{-- Section 1: Informasi Penyewa --}}
                     <div class="mb-8">
@@ -334,7 +335,7 @@
                                 <div class="w-28 relative">
                                     <input type="number" name="barang[0][jumlah]" placeholder="Jml"
                                         class="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-bold focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all"
-                                        value="1">
+                                        value="1" onchange="hitungOtomatis()">
                                     <span
                                         class="absolute -top-2 left-3 px-1 bg-white text-[9px] font-black text-slate-400 uppercase">Qty</span>
                                 </div>
@@ -351,8 +352,50 @@
                         </button>
                     </div>
 
-                    {{-- Section 4: Pembayaran & Keterangan --}}
-                    <div class="mb-4 bg-slate-900 rounded-3xl p-6 text-white shadow-xl">
+                    {{-- Section 4: Upload Bukti Pembayaran --}}
+                    <div class="mb-8">
+                        <div class="flex items-center gap-3 mb-5 text-indigo-600">
+                            <i class="fas fa-credit-card"></i>
+                            <span class="text-xs font-black uppercase tracking-widest">Bukti Pembayaran</span>
+                            <div class="h-[1px] flex-1 bg-slate-100"></div>
+                        </div>
+
+                        <div class="bg-slate-50 rounded-2xl p-5 border border-slate-200">
+                            <div class="relative">
+                                <div id="dropzoneBuktiPembayaran"
+                                    class="border-2 border-dashed border-slate-300 rounded-2xl p-8 text-center cursor-pointer hover:border-indigo-400 hover:bg-indigo-50/30 transition-all duration-300">
+                                    <div
+                                        class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm">
+                                        <i class="fas fa-cloud-upload-alt text-2xl text-slate-400"></i>
+                                    </div>
+                                    <p class="text-sm font-semibold text-slate-600">Klik untuk Upload Bukti Transfer</p>
+                                    <p class="text-[10px] text-slate-400 mt-1">Format: JPG, PNG (Maks 2MB)</p>
+                                    <input type="file" name="bukti_pembayaran" id="buktiPembayaranInput"
+                                        accept="image/*" class="hidden">
+                                </div>
+
+                                <div id="previewBuktiPembayaran"
+                                    class="hidden mt-4 animate-in fade-in slide-in-from-top-2">
+                                    <div class="relative inline-block w-full text-center">
+                                        <img id="previewImgBukti"
+                                            class="w-48 h-48 object-cover rounded-2xl border-4 border-white shadow-md mx-auto">
+                                        <button type="button" onclick="removeBuktiPembayaran()"
+                                            class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600 transition">
+                                            <i class="fas fa-times text-xs"></i>
+                                        </button>
+                                        <div
+                                            class="absolute bottom-2 left-1/2 -translate-x-1/2 px-3 py-1 bg-indigo-600 text-white text-[10px] font-black rounded-lg uppercase">
+                                            Preview</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="text-[10px] text-slate-400 mt-3 italic">*Upload bukti transfer/DP untuk memudahkan
+                                verifikasi pembayaran</p>
+                        </div>
+                    </div>
+
+                    {{-- Section 5: Pembayaran & Keterangan --}}
+                    <div class="mb-4 bg-gradient-to-br from-slate-800 to-slate-900 rounded-3xl p-6 text-white shadow-xl">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <label class="block text-xs font-bold text-slate-400 mb-2 ml-1">Potongan Diskon
@@ -361,12 +404,13 @@
                                     <span
                                         class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 font-bold text-sm">Rp</span>
                                     <input type="number" name="diskon" id="diskon" value="0"
-                                        class="w-full pl-12 pr-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-sm font-bold text-white focus:border-indigo-500 focus:ring-0">
+                                        class="w-full pl-12 pr-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-sm font-bold text-white focus:border-indigo-500 focus:ring-0"
+                                        oninput="hitungOtomatis()">
                                 </div>
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-slate-400 mb-2 ml-1">Status Pembayaran</label>
-                                <select name="status_pembayaran"
+                                <select name="status_pembayaran" id="status_pembayaran"
                                     class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-sm font-bold text-white focus:border-indigo-500 focus:ring-0">
                                     <option value="belum_bayar">Belum Bayar</option>
                                     <option value="dp">Down Payment (DP)</option>
@@ -378,6 +422,57 @@
                                 <textarea name="keterangan" rows="2"
                                     class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-sm font-medium text-white focus:border-indigo-500 focus:ring-0"
                                     placeholder="Catatan khusus peminjaman..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Section 6: PPN & Jatuh Tempo --}}
+                    <div class="mb-4 bg-gradient-to-r from-emerald-800 to-teal-800 rounded-3xl p-6 text-white shadow-xl">
+                        <div class="flex items-center gap-3 mb-4">
+                            <i class="fas fa-calculator text-lg"></i>
+                            <span class="text-xs font-black uppercase tracking-widest">Perhitungan PPN & Jatuh Tempo</span>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                            <div>
+                                <label class="block text-[10px] font-bold text-emerald-200 mb-1 uppercase">PPN (%)</label>
+                                <input type="number" id="ppn_persen" value="11" readonly
+                                    class="w-full px-4 py-2.5 bg-emerald-900/50 border border-emerald-700 rounded-xl text-sm font-bold text-white cursor-not-allowed">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-emerald-200 mb-1 uppercase">Total PPN
+                                    (Rp)</label>
+                                <div class="relative">
+                                    <span
+                                        class="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-300 font-bold text-sm">Rp</span>
+                                    <input type="text" id="total_ppn_display" value="0" readonly
+                                        class="w-full pl-12 pr-4 py-2.5 bg-emerald-900/50 border border-emerald-700 rounded-xl text-sm font-bold text-white cursor-not-allowed">
+                                    <input type="hidden" id="total_ppn" name="total_ppn" value="0">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-emerald-200 mb-1 uppercase">Grand Total +
+                                    PPN</label>
+                                <div class="relative">
+                                    <span
+                                        class="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-300 font-bold text-sm">Rp</span>
+                                    <input type="text" id="grand_total_with_ppn_display" value="0" readonly
+                                        class="w-full pl-12 pr-4 py-2.5 bg-emerald-900/50 border border-emerald-700 rounded-xl text-sm font-bold text-white cursor-not-allowed">
+                                    <input type="hidden" id="grand_total_with_ppn" name="grand_total_with_ppn"
+                                        value="0">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-emerald-700/50">
+                            <div class="flex justify-between items-center">
+                                <span class="text-[10px] font-bold text-emerald-200 uppercase tracking-wider">Jatuh Tempo
+                                    Pembayaran</span>
+                                <div class="flex items-center gap-3">
+                                    <i class="fas fa-calendar-alt text-emerald-300"></i>
+                                    <input type="date" id="jatuh_tempo_pembayaran" name="jatuh_tempo_pembayaran"
+                                        readonly
+                                        class="bg-emerald-900/50 border border-emerald-700 rounded-lg px-3 py-1.5 text-sm font-semibold text-white cursor-not-allowed">
+                                    <span class="text-[10px] text-emerald-300">(H+7 dari tanggal sewa)</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -422,12 +517,11 @@
             </div>
 
             <div class="overflow-y-auto custom-scrollbar">
-                <form id="formEditPeminjaman" class="px-8 py-8">
+                <form id="formEditPeminjaman" class="px-8 py-8" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
                     <input type="hidden" id="edit_id" name="id">
 
-                    {{-- Section 1: Identitas & Penyewa --}}
                     <div class="mb-8">
                         <div class="flex items-center gap-3 mb-5 text-amber-600">
                             <i class="fas fa-id-card"></i>
@@ -473,7 +567,6 @@
                         </div>
                     </div>
 
-                    {{-- Section 2: Penjadwalan Ulang --}}
                     <div class="mb-8">
                         <div class="flex items-center gap-3 mb-5 text-amber-600">
                             <i class="fas fa-clock"></i>
@@ -522,7 +615,6 @@
                         </div>
                     </div>
 
-                    {{-- Section 3: Daftar Barang --}}
                     <div class="mb-8">
                         <div class="flex items-center gap-3 mb-5 text-amber-600">
                             <i class="fas fa-boxes"></i>
@@ -538,8 +630,8 @@
                         </button>
                     </div>
 
-                    {{-- Section 4: Finansial & Catatan --}}
-                    <div class="mb-4 bg-slate-900 rounded-3xl p-6 text-white shadow-xl shadow-slate-200">
+                    <div
+                        class="mb-4 bg-gradient-to-br from-slate-800 to-slate-900 rounded-3xl p-6 text-white shadow-xl shadow-slate-200">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <label
@@ -574,7 +666,55 @@
                         </div>
                     </div>
 
-                    {{-- Action Buttons --}}
+                    {{-- Section PPN & Jatuh Tempo di Edit --}}
+                    <div class="mb-4 bg-gradient-to-r from-emerald-800 to-teal-800 rounded-3xl p-6 text-white shadow-xl">
+                        <div class="flex items-center gap-3 mb-4">
+                            <i class="fas fa-calculator text-lg"></i>
+                            <span class="text-xs font-black uppercase tracking-widest">Perhitungan PPN & Jatuh Tempo</span>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                            <div>
+                                <label class="block text-[10px] font-bold text-emerald-200 mb-1 uppercase">PPN (%)</label>
+                                <input type="text" id="edit_ppn_persen" value="11%" readonly
+                                    class="w-full px-4 py-2.5 bg-emerald-900/50 border border-emerald-700 rounded-xl text-sm font-bold text-white cursor-not-allowed">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-emerald-200 mb-1 uppercase">Total PPN
+                                    (Rp)</label>
+                                <div class="relative">
+                                    <span
+                                        class="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-300 font-bold text-sm">Rp</span>
+                                    <input type="text" id="edit_total_ppn_display" readonly
+                                        class="w-full pl-12 pr-4 py-2.5 bg-emerald-900/50 border border-emerald-700 rounded-xl text-sm font-bold text-white cursor-not-allowed">
+                                    <input type="hidden" id="edit_total_ppn" name="total_ppn">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-emerald-200 mb-1 uppercase">Grand Total +
+                                    PPN</label>
+                                <div class="relative">
+                                    <span
+                                        class="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-300 font-bold text-sm">Rp</span>
+                                    <input type="text" id="edit_grand_total_with_ppn_display" readonly
+                                        class="w-full pl-12 pr-4 py-2.5 bg-emerald-900/50 border border-emerald-700 rounded-xl text-sm font-bold text-white cursor-not-allowed">
+                                    <input type="hidden" id="edit_grand_total_with_ppn" name="grand_total_with_ppn">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-emerald-700/50">
+                            <div class="flex justify-between items-center">
+                                <span class="text-[10px] font-bold text-emerald-200 uppercase tracking-wider">Jatuh Tempo
+                                    Pembayaran</span>
+                                <div class="flex items-center gap-3">
+                                    <i class="fas fa-calendar-alt text-emerald-300"></i>
+                                    <input type="date" id="edit_jatuh_tempo_pembayaran" name="jatuh_tempo_pembayaran"
+                                        readonly
+                                        class="bg-emerald-900/50 border border-emerald-700 rounded-lg px-3 py-1.5 text-sm font-semibold text-white cursor-not-allowed">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="flex flex-col sm:flex-row gap-3 mt-8">
                         <button type="submit"
                             class="flex-[2] bg-amber-500 hover:bg-amber-600 text-white font-black py-4 rounded-2xl shadow-lg shadow-amber-200 transition-all transform active:scale-[0.98] flex items-center justify-center gap-2 uppercase tracking-wider">
@@ -633,7 +773,6 @@
                         secara otomatis saat Anda mengetik.</p>
                 </div>
 
-                {{-- Hasil Pencarian --}}
                 <div id="hasilCekPelanggan" class="hidden animate-in slide-in-from-bottom-4 duration-300">
                     <div
                         class="bg-gradient-to-br from-white to-slate-50 border border-slate-200 rounded-[1.5rem] p-6 shadow-sm">
@@ -697,7 +836,6 @@
                     </div>
                 </div>
 
-                {{-- Not Found State --}}
                 <div id="pelangganNotFound" class="hidden py-12 text-center animate-in fade-in duration-500">
                     <div class="relative inline-block mb-6">
                         <div class="w-24 h-24 bg-slate-50 rounded-[2.5rem] flex items-center justify-center mx-auto">
@@ -726,7 +864,7 @@
         class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4 transition-all duration-300"
         onclick="if(event.target===this) closeDetailModal()">
         <div
-            class="bg-white rounded-[2rem] shadow-2xl max-w-3xl w-full max-h-[85vh] overflow-hidden flex flex-col animate-in fade-in zoom-in duration-200">
+            class="bg-white rounded-4xl shadow-2xl max-w-3xl w-full max-h-[85vh] overflow-hidden flex flex-col animate-in fade-in zoom-in duration-200">
             <div
                 class="sticky top-0 bg-white/80 backdrop-blur-md border-b border-slate-100 px-8 py-5 flex justify-between items-center z-10">
                 <div class="flex items-center gap-3">
@@ -759,7 +897,7 @@
         class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4 transition-all duration-300"
         onclick="if(event.target===this) closePengembalianModal()">
         <div
-            class="bg-white rounded-[2rem] shadow-2xl max-w-lg w-full max-h-[92vh] flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200">
+            class="bg-white rounded-4xl shadow-2xl max-w-lg w-full max-h-[92vh] flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200">
             <div class="px-8 py-5 border-b border-slate-100 flex justify-between items-center bg-white sticky top-0 z-10">
                 <div>
                     <h3 class="text-xl font-extrabold text-slate-800 flex items-center gap-2">
@@ -869,7 +1007,7 @@
 
                     <div class="flex flex-col sm:flex-row gap-3 mt-10">
                         <button type="submit"
-                            class="flex-[2] bg-emerald-600 hover:bg-emerald-700 text-white font-black py-4 rounded-2xl shadow-lg shadow-emerald-200 transition-all transform active:scale-[0.98] flex items-center justify-center gap-2 uppercase tracking-wider">
+                            class="flex-2 bg-emerald-600 hover:bg-emerald-700 text-white font-black py-4 rounded-2xl shadow-lg shadow-emerald-200 transition-all transform active:scale-[0.98] flex items-center justify-center gap-2 uppercase tracking-wider">
                             Konfirmasi Selesai
                         </button>
                         <button type="button" onclick="closePengembalianModal()"
@@ -887,7 +1025,7 @@
         <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onclick="closeDeleteModal()">
         </div>
         <div
-            class="relative bg-white w-full max-w-sm rounded-[2rem] shadow-2xl overflow-hidden transform transition-all animate-in fade-in zoom-in duration-200">
+            class="relative bg-white w-full max-w-sm rounded-4xl shadow-2xl overflow-hidden transform transition-all animate-in fade-in zoom-in duration-200">
             <div class="p-8 text-center">
                 <div
                     class="w-20 h-20 bg-rose-50 text-rose-500 rounded-3xl flex items-center justify-center mx-auto mb-6 transform rotate-3">
@@ -1050,13 +1188,13 @@
             };
             const s = config[status] || config.aktif;
             return `<span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-[10px] font-black uppercase tracking-widest transition-all duration-300 hover:shadow-sm ${s.container}">
-            <span class="relative flex h-2 w-2 ${status === 'selesai' ? 'hidden' : ''}">
-                <span class="animate-ping absolute inline-flex h-full w-full rounded-full ${s.ping} opacity-75"></span>
-                <span class="relative inline-flex rounded-full h-2 w-2 ${s.dot}"></span>
-            </span>
-            ${s.icon}
-            <span class="leading-none">${s.text}</span>
-        </span>`;
+                <span class="relative flex h-2 w-2 ${status === 'selesai' ? 'hidden' : ''}">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full ${s.ping} opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 ${s.dot}"></span>
+                </span>
+                ${s.icon}
+                <span class="leading-none">${s.text}</span>
+            </span>`;
         }
 
         function showToast(msg, type) {
@@ -1068,6 +1206,45 @@
             document.getElementById('toastMessage').textContent = msg;
             toast.classList.remove('hidden');
             setTimeout(() => toast.classList.add('hidden'), 3000);
+        }
+
+        // ==================== HITUNG OTOMATIS PPN & JATUH TEMPO ====================
+        function hitungOtomatis() {
+            let totalHarga = 0;
+            document.querySelectorAll('#barangContainer .barang-row').forEach(row => {
+                const select = row.querySelector('.barang-select');
+                const jumlah = row.querySelector('input[name*="[jumlah]"]')?.value || 0;
+                if (select && select.selectedIndex > 0 && jumlah > 0) {
+                    const optionText = select.options[select.selectedIndex].text;
+                    const match = optionText.match(/\(Rp\s([\d.,]+)\)/);
+                    if (match) {
+                        const harga = parseInt(match[1].replace(/\./g, '').replace(/,/g, ''));
+                        totalHarga += harga * parseInt(jumlah);
+                    }
+                }
+            });
+
+            const diskon = parseInt(document.getElementById('diskon')?.value || 0);
+            const grandTotal = totalHarga - diskon;
+            const ppnPersen = 0.11;
+            const totalPpn = grandTotal * ppnPersen;
+            const grandTotalWithPpn = grandTotal + totalPpn;
+
+            document.getElementById('total_ppn_display').value = formatRupiahInput(totalPpn);
+            document.getElementById('total_ppn').value = totalPpn;
+            document.getElementById('grand_total_with_ppn_display').value = formatRupiahInput(grandTotalWithPpn);
+            document.getElementById('grand_total_with_ppn').value = grandTotalWithPpn;
+
+            const tanggalSewa = document.getElementById('tanggal_sewa')?.value;
+            if (tanggalSewa) {
+                const jatuhTempo = new Date(tanggalSewa);
+                jatuhTempo.setDate(jatuhTempo.getDate() + 7);
+                document.getElementById('jatuh_tempo_pembayaran').value = jatuhTempo.toISOString().split('T')[0];
+            }
+        }
+
+        function formatRupiahInput(angka) {
+            return new Intl.NumberFormat('id-ID').format(Math.round(angka));
         }
 
         // ==================== BARANG FUNCTIONS ====================
@@ -1107,36 +1284,48 @@
             const newRow = document.createElement('div');
             newRow.className = 'flex gap-3 items-center barang-row animate-in slide-in-from-left-2 duration-200';
             newRow.innerHTML = `
-            <div class="flex-1 relative group">
-                <select name="barang[${index}][id]" class="barang-select w-full pl-4 pr-10 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-bold focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all appearance-none cursor-pointer">
-                    <option value="">Pilih Barang...</option>
-                </select>
-                <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-slate-400">
-                    <i class="fas fa-chevron-down text-[10px]"></i>
+                <div class="flex-1 relative group">
+                    <select name="barang[${index}][id]" class="barang-select w-full pl-4 pr-10 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-bold focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all appearance-none cursor-pointer">
+                        <option value="">Pilih Barang...</option>
+                    </select>
+                    <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-slate-400">
+                        <i class="fas fa-chevron-down text-[10px]"></i>
+                    </div>
                 </div>
-            </div>
-            <div class="w-28 relative">
-                <input type="number" name="barang[${index}][jumlah]" placeholder="Jml" class="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-bold focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all" value="1">
-                <span class="absolute -top-2 left-3 px-1 bg-white text-[9px] font-black text-slate-400 uppercase">Qty</span>
-            </div>
-            <button type="button" onclick="removeBarang(this)" class="w-10 h-10 flex items-center justify-center text-rose-500 hover:bg-rose-50 rounded-xl transition-all">
-                <i class="fas fa-trash-alt text-sm"></i>
-            </button>
-        `;
+                <div class="w-28 relative">
+                    <input type="number" name="barang[${index}][jumlah]" placeholder="Jml" class="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-bold focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all" value="1">
+                    <span class="absolute -top-2 left-3 px-1 bg-white text-[9px] font-black text-slate-400 uppercase">Qty</span>
+                </div>
+                <button type="button" onclick="removeBarang(this)" class="w-10 h-10 flex items-center justify-center text-rose-500 hover:bg-rose-50 rounded-xl transition-all">
+                    <i class="fas fa-trash-alt text-sm"></i>
+                </button>
+            `;
             container.appendChild(newRow);
             populateBarangSelects();
+            setTimeout(() => {
+                attachBarangChangeEvent();
+                hitungOtomatis();
+            }, 100);
         }
 
         function removeBarang(btn) {
             const rows = document.querySelectorAll('.barang-row');
             if (rows.length > 1) btn.closest('.barang-row').remove();
+            setTimeout(hitungOtomatis, 100);
+        }
+
+        function attachBarangChangeEvent() {
+            document.querySelectorAll('#barangContainer .barang-select, #barangContainer input[name*="[jumlah]"]').forEach(
+                el => {
+                    el.removeEventListener('change', hitungOtomatis);
+                    el.addEventListener('change', hitungOtomatis);
+                });
         }
 
         // ==================== FETCH DATA ====================
         async function fetchData() {
             if (isLoading) return;
             isLoading = true;
-
             try {
                 const params = new URLSearchParams({
                     page: currentPage,
@@ -1152,7 +1341,6 @@
                 });
                 if (!response.ok) throw new Error('HTTP error! status: ' + response.status);
                 const result = await response.json();
-
                 if (result.data) {
                     renderTable(result.data);
                     if (result.pagination) renderPagination(result.pagination);
@@ -1162,7 +1350,6 @@
                 }
                 updateBadges();
             } catch (error) {
-                console.error('Error:', error);
                 document.getElementById('peminjamanTableBody').innerHTML =
                     `<tr><td colspan="7" class="px-6 py-12 text-center text-red-500">Error: ${error.message}</td></tr>`;
             } finally {
@@ -1184,7 +1371,6 @@
                     }
                 });
                 const riwayatResult = await riwayatRes.json();
-
                 const badgeAktif = document.getElementById('badgeAktif');
                 const badgeRiwayat = document.getElementById('badgeRiwayat');
                 if (badgeAktif) badgeAktif.textContent = (aktifResult.pagination && aktifResult.pagination.total) || 0;
@@ -1203,7 +1389,6 @@
                     '<tr><td colspan="7" class="px-6 py-12 text-center"><i class="fas fa-inbox text-4xl text-slate-300 mb-2 block"></i>Belum ada data</td></tr>';
                 return;
             }
-
             let html = '';
             data.forEach(item => {
                 const barangListStr = item.details?.length ? item.details.map(d => d.nama_barang).join(', ') : '-';
@@ -1211,30 +1396,27 @@
                 const totalTransaksi = item.pelanggan?.total_transaksi || 0;
                 const isPelangganBaru = totalTransaksi <= 1;
                 const badgePelanggan = isPelangganBaru ?
-                    '<span class="bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded-full"><i class="fas fa-star fa-xs mr-1"></i>Baru</span>' :
-                    '<span class="bg-blue-100 text-blue-700 text-xs px-2 py-0.5 rounded-full"><i class="fas fa-check-circle fa-xs mr-1"></i>Lama</span>';
-
+                    '<span class="bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded-full"><i class="fas fa-star fa-xs mr-2"></i>Baru</span>' :
+                    '<span class="bg-blue-100 text-blue-700 text-xs px-2 py-0.5 rounded-full"><i class="fas fa-check-circle fa-xs mr-2"></i>Lama</span>';
                 html += `<tr class="hover:bg-slate-50 transition border-b border-slate-100">
-                <td class="px-6 py-3 text-xs font-mono font-semibold">${escapeHtml(item.invoice_number)}</td>
-                <td class="px-6 py-3 text-sm font-medium">${escapeHtml(item.nama_penyewa)}${badgePelanggan}</td>
-                <td class="px-6 py-3 text-xs text-slate-600">${escapeHtml(barangListStr.substring(0, 40))}${barangListStr.length > 40 ? '...' : ''}</td>
-                <td class="px-6 py-3 text-xs text-center">${formatShortDate(item.tanggal_sewa)} - ${formatShortDate(item.tanggal_kembali)}</td>
-                <td class="px-6 py-3 text-xs font-semibold text-right">${formatRupiah(item.grand_total)}</td>
-                <td class="px-6 py-3 text-center">${getStatusBadge(item.status_pengembalian)}</td>
-                <td class="px-6 py-3 text-center">
-                    <div class="flex items-center justify-center gap-1.5 flex-wrap">
+                    <td class="px-6 py-3 text-xs font-mono font-semibold">${escapeHtml(item.invoice_number)}</td>
+                    <td class="px-6 py-3 text-sm font-medium">${escapeHtml(item.nama_penyewa)}${badgePelanggan}</td>
+                    <td class="px-6 py-3 text-xs text-slate-600">${escapeHtml(barangListStr.substring(0, 40))}${barangListStr.length > 40 ? '...' : ''}</td>
+                    <td class="px-6 py-3 text-xs text-center">${formatShortDate(item.tanggal_sewa)} - ${formatShortDate(item.tanggal_kembali)}</td>
+                    <td class="px-6 py-3 text-xs font-semibold text-right">${formatRupiah(item.grand_total_with_ppn || item.grand_total)}</td>
+                    <td class="px-6 py-3 text-center">${getStatusBadge(item.status_pengembalian)}</td>
+                    <td class="px-6 py-3 text-center"><div class="flex items-center justify-center gap-1.5 flex-wrap">
                         <button onclick="viewDetail(${item.id})" class="text-blue-600 hover:text-blue-800 p-1" title="Detail"><i class="fas fa-eye text-sm"></i></button>
                         ${isAktif ? `<button onclick="openEditModal(${item.id})" class="text-orange-600 hover:text-orange-800 p-1" title="Edit"><i class="fas fa-edit text-sm"></i></button>` : ''}
                         <button onclick="printInvoice(${item.id})" class="text-gray-600 hover:text-gray-800 p-1" title="Invoice"><i class="fas fa-print text-sm"></i></button>
                         ${isAktif ? `
-                                    <button onclick="openPengembalianModal(${item.id})" class="text-green-600 hover:text-green-800 p-1" title="Pengembalian"><i class="fas fa-undo-alt text-sm"></i></button>
-                                    <button onclick="sendPengirimanNotif(${item.id})" class="text-purple-600 hover:text-purple-800 p-1" title="Kirim WhatsApp"><i class="fab fa-whatsapp text-sm"></i></button>
-                                    <button onclick="sendPengingatNotif(${item.id})" class="text-yellow-600 hover:text-yellow-800 p-1" title="Pengingat"><i class="fas fa-bell text-sm"></i></button>
-                                ` : ''}
+                                <button onclick="openPengembalianModal(${item.id})" class="text-green-600 hover:text-green-800 p-1" title="Pengembalian"><i class="fas fa-undo-alt text-sm"></i></button>
+                                <button onclick="sendPengirimanNotif(${item.id})" class="text-purple-600 hover:text-purple-800 p-1" title="Kirim WhatsApp"><i class="fab fa-whatsapp text-sm"></i></button>
+                                <button onclick="sendPengingatNotif(${item.id})" class="text-yellow-600 hover:text-yellow-800 p-1" title="Pengingat"><i class="fas fa-bell text-sm"></i></button>
+                            ` : ''}
                         <button onclick="deleteData(${item.id})" class="text-red-600 hover:text-red-800 p-1" title="Hapus"><i class="fas fa-trash text-sm"></i></button>
-                    </div>
-                </td>
-            </tr>`;
+                    </div></td>
+                </tr>`;
             });
             tbody.innerHTML = html;
         }
@@ -1246,13 +1428,11 @@
                 container.innerHTML = '';
                 return;
             }
-
             let html = '<div class="flex justify-center gap-1">';
             const current = pagination.current_page;
             const last = pagination.last_page;
             let start = Math.max(1, current - 2);
             let end = Math.min(last, current + 2);
-
             if (start > 1) {
                 html += `<button onclick="changePage(1)" class="px-3 py-1 text-sm rounded-lg border">1</button>`;
                 if (start > 2) html += '<span class="px-2">...</span>';
@@ -1264,7 +1444,7 @@
             if (end < last) {
                 if (end < last - 1) html += '<span class="px-2">...</span>';
                 html +=
-                    `<button onclick="changePage(${last})" class="px-3 py-1 text-sm rounded-lg border">${last}</button>`;
+                `<button onclick="changePage(${last})" class="px-3 py-1 text-sm rounded-lg border">${last}</button>`;
             }
             html += '</div>';
             container.innerHTML = html;
@@ -1292,6 +1472,8 @@
             }
             const form = document.getElementById('formPeminjaman');
             if (form) form.reset();
+            document.getElementById('previewBuktiPembayaran').classList.add('hidden');
+            document.getElementById('buktiPembayaranInput').value = '';
         }
 
         function printInvoice(id) {
@@ -1309,7 +1491,6 @@
                         detailsHtml +=
                             `<tr class="border-b"><td class="py-1.5 text-sm">${escapeHtml(d.nama_barang)}</td><td class="py-1.5 text-center text-sm">${d.jumlah}</td><td class="py-1.5 text-right text-sm">${formatRupiah(d.harga_sewa)}</td><td class="py-1.5 text-right text-sm font-semibold">${formatRupiah(d.subtotal)}</td></tr>`;
                     });
-
                     const buktiPembayaranHtml = data.bukti_pembayaran ?
                         `<div class="mb-4"><p class="font-semibold text-sm mb-2">Bukti Pembayaran:</p><img src="/storage/${data.bukti_pembayaran}" class="w-48 h-48 object-cover rounded-lg border cursor-pointer" onclick="window.open('/storage/${data.bukti_pembayaran}', '_blank')"></div>` :
                         '';
@@ -1319,26 +1500,27 @@
                     const infoPengembalianHtml = data.status_pengembalian === 'selesai' ?
                         `<div class="mt-4 p-3 bg-gray-50 rounded-lg"><h4 class="font-semibold text-sm mb-2">Informasi Pengembalian:</h4><p class="text-sm">Tanggal Kembali Real: ${formatDate(data.tanggal_pengembalian_real) || '-'}</p><p class="text-sm">Kondisi Barang: ${data.kondisi_barang || '-'}</p>${data.kerusakan ? `<p class="text-sm">Kerusakan: ${data.kerusakan}</p>` : ''}${data.denda > 0 ? `<p class="text-sm">Denda: ${formatRupiah(data.denda)}</p>` : ''}${data.catatan_pengembalian ? `<p class="text-sm">Catatan: ${data.catatan_pengembalian}</p>` : ''}</div>` :
                         '';
-
                     document.getElementById('detailContent').innerHTML = `
-                    <div class="grid grid-cols-2 gap-3 mb-4 pb-3 border-b">
-                        <div><p class="text-xs text-slate-500">Invoice</p><p class="font-mono font-semibold text-sm">${data.invoice_number}</p></div>
-                        <div><p class="text-xs text-slate-500">Status</p>${getStatusBadge(data.status_pengembalian)}</div>
-                        <div><p class="text-xs text-slate-500">Penyewa</p><p class="font-semibold text-sm">${escapeHtml(data.nama_penyewa)}</p></div>
-                        <div><p class="text-xs text-slate-500">Telepon</p><p class="text-sm">${escapeHtml(data.no_telepon)}</p></div>
-                        <div><p class="text-xs text-slate-500">Tanggal Sewa</p><p class="text-sm">${formatDate(data.tanggal_sewa)} | ${data.waktu_sewa}</p></div>
-                        <div><p class="text-xs text-slate-500">Tanggal Kembali</p><p class="text-sm">${formatDate(data.tanggal_kembali)} | ${data.waktu_kembali}</p></div>
-                        <div><p class="text-xs text-slate-500">Status Pembayaran</p><p class="text-sm">${data.status_pembayaran || '-'}</p></div>
-                        <div><p class="text-xs text-slate-500">Total</p><p class="text-sm font-bold">${formatRupiah(data.grand_total)}</p></div>
-                    </div>
-                    ${buktiPembayaranHtml}
-                    <div class="mb-3">
-                        <p class="font-semibold text-sm mb-2">Detail Barang:</p>
-                        <div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="bg-gray-50"><th class="px-2 py-1 text-left">Barang</th><th class="px-2 py-1 text-center w-16">Jml</th><th class="px-2 py-1 text-right w-28">Harga</th><th class="px-2 py-1 text-right w-28">Subtotal</th></tr></thead><tbody>${detailsHtml}</tbody><tfoot><tr class="border-t"><td colspan="3" class="px-2 py-2 text-right font-bold">TOTAL</td><td class="px-2 py-2 text-right font-bold">${formatRupiah(data.grand_total)}</td></tr></tfoot></table></div>
-                    </div>
-                    ${buktiPengembalianHtml}
-                    ${infoPengembalianHtml}
-                `;
+                        <div class="grid grid-cols-2 gap-3 mb-4 pb-3 border-b">
+                            <div><p class="text-xs text-slate-500">Invoice</p><p class="font-mono font-semibold text-sm">${data.invoice_number}</p></div>
+                            <div><p class="text-xs text-slate-500">Status</p>${getStatusBadge(data.status_pengembalian)}</div>
+                            <div><p class="text-xs text-slate-500">Penyewa</p><p class="font-semibold text-sm">${escapeHtml(data.nama_penyewa)}</p></div>
+                            <div><p class="text-xs text-slate-500">Telepon</p><p class="text-sm">${escapeHtml(data.no_telepon)}</p></div>
+                            <div><p class="text-xs text-slate-500">Tanggal Sewa</p><p class="text-sm">${formatDate(data.tanggal_sewa)} | ${data.waktu_sewa}</p></div>
+                            <div><p class="text-xs text-slate-500">Tanggal Kembali</p><p class="text-sm">${formatDate(data.tanggal_kembali)} | ${data.waktu_kembali}</p></div>
+                            <div><p class="text-xs text-slate-500">Status Pembayaran</p><p class="text-sm">${data.status_pembayaran || '-'}</p></div>
+                            <div><p class="text-xs text-slate-500">Subtotal</p><p class="text-sm">${formatRupiah(data.total_harga)}</p></div>
+                            <div><p class="text-xs text-slate-500">Diskon</p><p class="text-sm">${formatRupiah(data.diskon || 0)}</p></div>
+                            <div><p class="text-xs text-slate-500">Grand Total</p><p class="text-sm font-bold">${formatRupiah(data.grand_total)}</p></div>
+                            <div><p class="text-xs text-slate-500">PPN 11%</p><p class="text-sm font-semibold text-emerald-600">${formatRupiah(data.total_ppn || 0)}</p></div>
+                            <div class="col-span-2 bg-indigo-50 p-2 rounded-lg"><p class="text-xs text-slate-500">Grand Total + PPN</p><p class="text-lg font-bold text-indigo-600">${formatRupiah(data.grand_total_with_ppn || data.grand_total)}</p></div>
+                            <div><p class="text-xs text-slate-500">Jatuh Tempo Pembayaran</p><p class="text-sm font-semibold text-rose-600">${formatDate(data.jatuh_tempo_pembayaran) || '-'}</p></div>
+                        </div>
+                        ${buktiPembayaranHtml}
+                        <div class="mb-3"><p class="font-semibold text-sm mb-2">Detail Barang:</p><div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="bg-gray-50"><th class="px-2 py-1 text-left">Barang</th><th class="px-2 py-1 text-center w-16">Jml</th><th class="px-2 py-1 text-right w-28">Harga</th><th class="px-2 py-1 text-right w-28">Subtotal</th></tr></thead><tbody>${detailsHtml}</tbody><tfoot><tr class="border-t"><td colspan="3" class="px-2 py-2 text-right font-bold">TOTAL</td><td class="px-2 py-2 text-right font-bold">${formatRupiah(data.total_harga)}</td></tr></tfoot></table></div></div>
+                        ${buktiPengembalianHtml}
+                        ${infoPengembalianHtml}
+                    `;
                     const modal = document.getElementById('modalDetail');
                     modal.classList.remove('hidden');
                     modal.classList.add('flex');
@@ -1370,7 +1552,6 @@
             const originalContent = btn.innerHTML;
             btn.disabled = true;
             btn.innerHTML = '<i class="fas fa-circle-notch fa-spin mr-2"></i> Menghapus...';
-
             try {
                 const response = await fetch(`/peminjaman/${currentDeleteId}`, {
                     method: 'DELETE',
@@ -1425,12 +1606,19 @@
                     document.getElementById('edit_diskon').value = data.diskon || 0;
                     document.getElementById('edit_status_pembayaran').value = data.status_pembayaran || 'belum_bayar';
                     document.getElementById('edit_keterangan').value = data.keterangan || '';
-
+                    document.getElementById('edit_total_ppn_display').value = formatRupiahInput(data.total_ppn || 0);
+                    document.getElementById('edit_total_ppn').value = data.total_ppn || 0;
+                    document.getElementById('edit_grand_total_with_ppn_display').value = formatRupiahInput(data
+                        .grand_total_with_ppn || data.grand_total);
+                    document.getElementById('edit_grand_total_with_ppn').value = data.grand_total_with_ppn || data
+                        .grand_total;
+                    if (data.jatuh_tempo_pembayaran) {
+                        document.getElementById('edit_jatuh_tempo_pembayaran').value = data.jatuh_tempo_pembayaran;
+                    }
                     const container = document.getElementById('editBarangContainer');
                     container.innerHTML = '';
                     if (data.details?.length) data.details.forEach(d => addEditBarangRow(d.barang_id, d.jumlah));
                     else addEditBarangRow(null, 1);
-
                     const modal = document.getElementById('modalEdit');
                     modal.classList.remove('hidden');
                     modal.classList.add('flex');
@@ -1457,22 +1645,22 @@
             const newRow = document.createElement('div');
             newRow.className = 'flex gap-3 items-center barang-row mb-2';
             newRow.innerHTML = `
-            <div class="flex-1 relative group">
-                <select name="barang[${index}][id]" class="barang-select w-full pl-4 pr-10 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-bold focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all appearance-none cursor-pointer">
-                    <option value="">Pilih Barang...</option>
-                </select>
-                <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-slate-400">
-                    <i class="fas fa-chevron-down text-[10px]"></i>
+                <div class="flex-1 relative group">
+                    <select name="barang[${index}][id]" class="barang-select w-full pl-4 pr-10 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-bold focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all appearance-none cursor-pointer">
+                        <option value="">Pilih Barang...</option>
+                    </select>
+                    <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-slate-400">
+                        <i class="fas fa-chevron-down text-[10px]"></i>
+                    </div>
                 </div>
-            </div>
-            <div class="w-28 relative">
-                <input type="number" name="barang[${index}][jumlah]" class="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-bold focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all" value="${jumlah}">
-                <span class="absolute -top-2 left-3 px-1 bg-white text-[9px] font-black text-slate-400 uppercase">Qty</span>
-            </div>
-            <button type="button" onclick="removeEditBarang(this)" class="w-10 h-10 flex items-center justify-center text-rose-500 hover:bg-rose-50 rounded-xl transition-all">
-                <i class="fas fa-trash-alt text-sm"></i>
-            </button>
-        `;
+                <div class="w-28 relative">
+                    <input type="number" name="barang[${index}][jumlah]" class="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-bold focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all" value="${jumlah}">
+                    <span class="absolute -top-2 left-3 px-1 bg-white text-[9px] font-black text-slate-400 uppercase">Qty</span>
+                </div>
+                <button type="button" onclick="removeEditBarang(this)" class="w-10 h-10 flex items-center justify-center text-rose-500 hover:bg-rose-50 rounded-xl transition-all">
+                    <i class="fas fa-trash-alt text-sm"></i>
+                </button>
+            `;
             container.appendChild(newRow);
             populateBarangSelects();
             if (selectedId) newRow.querySelector('.barang-select').value = selectedId;
@@ -1541,7 +1729,6 @@
                 }
             }
         }
-
         async function sendPengingatNotif(id) {
             if (confirm('Kirim pengingat pengembalian ke pelanggan?')) {
                 try {
@@ -1558,6 +1745,34 @@
                     showToast('Gagal mengirim pengingat', 'error');
                 }
             }
+        }
+
+        // ==================== UPLOAD BUKTI PEMBAYARAN ====================
+        const dropzoneBukti = document.getElementById('dropzoneBuktiPembayaran');
+        const buktiInput = document.getElementById('buktiPembayaranInput');
+        const previewBukti = document.getElementById('previewBuktiPembayaran');
+        const previewImgBukti = document.getElementById('previewImgBukti');
+
+        if (dropzoneBukti && buktiInput) {
+            dropzoneBukti.addEventListener('click', () => buktiInput.click());
+            buktiInput.addEventListener('change', (e) => {
+                if (e.target.files && e.target.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = (ev) => {
+                        previewImgBukti.src = ev.target.result;
+                        previewBukti.classList.remove('hidden');
+                        dropzoneBukti.classList.add('hidden');
+                    };
+                    reader.readAsDataURL(e.target.files[0]);
+                }
+            });
+        }
+
+        function removeBuktiPembayaran() {
+            previewBukti.classList.add('hidden');
+            dropzoneBukti.classList.remove('hidden');
+            buktiInput.value = '';
+            previewImgBukti.src = '';
         }
 
         // ==================== CEK PELANGGAN FUNCTIONS ====================
@@ -1579,16 +1794,14 @@
 
         async function searchPelangganAutocomplete(keyword) {
             try {
-                const response = await fetch(`/peminjaman/pelanggan-list?search=${encodeURIComponent(keyword)}`);
+                const response = await fetch(`/api/pelanggan/list?search=${encodeURIComponent(keyword)}`);
                 const result = await response.json();
                 const dropdown = document.getElementById('autocompleteDropdown');
                 if (result.data?.length) {
                     let html = '';
                     result.data.forEach(p => {
-                        html += `<div onclick="selectPelangganSuggestion(${p.id}, '${escapeHtml(p.nama)}', '${escapeHtml(p.no_telepon)}')" class="px-4 py-2 hover:bg-gray-100 cursor-pointer border-b border-slate-100 last:border-0">
-                        <div class="font-medium">${escapeHtml(p.nama)}</div>
-                        <div class="text-xs text-slate-500">${escapeHtml(p.no_telepon)}</div>
-                    </div>`;
+                        html +=
+                            `<div onclick="selectPelangganSuggestion(${p.id}, '${escapeHtml(p.nama)}', '${escapeHtml(p.no_telepon)}')" class="px-4 py-2 hover:bg-gray-100 cursor-pointer border-b border-slate-100 last:border-0"><div class="font-medium">${escapeHtml(p.nama)}</div><div class="text-xs text-slate-500">${escapeHtml(p.no_telepon)}</div></div>`;
                     });
                     dropdown.innerHTML = html;
                     dropdown.classList.remove('hidden');
@@ -1597,6 +1810,7 @@
                 }
             } catch (error) {
                 console.error('Error:', error);
+                document.getElementById('autocompleteDropdown').classList.add('hidden');
             }
         }
 
@@ -1608,22 +1822,22 @@
 
         async function searchPelanggan(keyword) {
             try {
-                const response = await fetch('/peminjaman/cek-pelanggan', {
+                const response = await fetch('/api/pelanggan/cek', {
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
                     },
                     body: JSON.stringify({
                         keyword
                     })
                 });
                 const result = await response.json();
-
                 if (result.exists) {
+                    document.getElementById('newCustomerInfo').classList.add('hidden');
                     const isPelangganBaru = result.total_transaksi <= 1;
                     const statusColor = isPelangganBaru ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700';
-
                     document.getElementById('hasilNama').innerHTML =
                         `${escapeHtml(result.data.nama)} <span class="text-xs ${statusColor} px-2 py-0.5 rounded-full ml-2">${isPelangganBaru ? 'Pelanggan Baru' : 'Pelanggan Lama'}</span>`;
                     document.getElementById('hasilTelepon').textContent = result.data.no_telepon;
@@ -1632,7 +1846,6 @@
                         `<span class="text-lg font-bold">${result.total_transaksi}</span> <span class="text-sm ${isPelangganBaru ? 'text-green-600' : 'text-blue-600'} ml-1">(transaksi)</span>`;
                     document.getElementById('hasilTotalNilai').innerHTML =
                         `<span class="text-lg font-bold">${formatRupiah(result.total_nilai)}</span>`;
-
                     const statusSpan = document.getElementById('hasilStatus');
                     if (result.data.status === 'aktif') {
                         statusSpan.textContent = 'Aktif';
@@ -1643,36 +1856,30 @@
                         statusSpan.className =
                             'px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-tighter bg-red-100 text-red-700';
                     }
-
                     const riwayatList = document.getElementById('riwayatList');
                     if (result.riwayat?.length) {
                         let riwayatHtml = '';
                         result.riwayat.forEach(r => {
-                            riwayatHtml += `<div class="bg-white rounded-lg p-2 border border-slate-200">
-                            <div class="flex justify-between items-center"><span class="font-mono text-xs font-semibold">${r.invoice_number}</span><span class="text-xs ${r.status_pengembalian === 'aktif' ? 'text-green-600' : 'text-gray-500'}">${r.status_pengembalian === 'aktif' ? '🟢 Aktif' : '✅ Selesai'}</span></div>
-                            <div class="text-xs text-slate-500 mt-1">Tanggal: ${formatDate(r.tanggal_sewa)} - ${formatDate(r.tanggal_kembali)}</div>
-                            <div class="text-xs font-semibold mt-1">Total: ${formatRupiah(r.grand_total)}</div>
-                        </div>`;
+                            riwayatHtml +=
+                                `<div class="bg-white rounded-lg p-2 border border-slate-200"><div class="flex justify-between items-center"><span class="font-mono text-xs font-semibold">${r.invoice_number}</span><span class="text-xs ${r.status_pengembalian === 'aktif' ? 'text-green-600' : 'text-gray-500'}">${r.status_pengembalian === 'aktif' ? '🟢 Aktif' : '✅ Selesai'}</span></div><div class="text-xs text-slate-500 mt-1">Tanggal: ${formatDate(r.tanggal_sewa)} - ${formatDate(r.tanggal_kembali)}</div><div class="text-xs font-semibold mt-1">Total: ${formatRupiah(r.grand_total_with_ppn || r.grand_total)}</div></div>`;
                         });
                         riwayatList.innerHTML = riwayatHtml;
                     } else {
                         riwayatList.innerHTML = '<p class="text-xs text-slate-500">Belum ada riwayat peminjaman</p>';
                     }
-
                     selectedCustomer = result.data;
                     document.getElementById('hasilCekPelanggan').classList.remove('hidden');
                     document.getElementById('pelangganNotFound').classList.add('hidden');
                 } else {
+                    document.getElementById('newCustomerInfo').classList.remove('hidden');
                     document.getElementById('hasilCekPelanggan').classList.add('hidden');
                     document.getElementById('pelangganNotFound').classList.remove('hidden');
                     const suggestionsContainer = document.getElementById('suggestionsContainer');
                     if (result.suggestions?.length) {
                         let suggestionsHtml = '<p class="text-sm text-slate-600 mb-2">Pelanggan dengan nama mirip:</p>';
                         result.suggestions.forEach(s => {
-                            suggestionsHtml += `<div onclick="selectPelangganSuggestion(${s.id}, '${escapeHtml(s.nama)}', '${escapeHtml(s.no_telepon)}')" class="p-2 bg-gray-100 rounded-lg mb-2 cursor-pointer hover:bg-gray-200">
-                            <div class="font-medium">${escapeHtml(s.nama)}</div>
-                            <div class="text-xs text-slate-500">${escapeHtml(s.no_telepon)}</div>
-                        </div>`;
+                            suggestionsHtml +=
+                                `<div onclick="selectPelangganSuggestion(${s.id}, '${escapeHtml(s.nama)}', '${escapeHtml(s.no_telepon)}')" class="p-2 bg-gray-100 rounded-lg mb-2 cursor-pointer hover:bg-gray-200"><div class="font-medium">${escapeHtml(s.nama)}</div><div class="text-xs text-slate-500">${escapeHtml(s.no_telepon)}</div></div>`;
                         });
                         suggestionsContainer.innerHTML = suggestionsHtml;
                     } else {
@@ -1688,6 +1895,7 @@
 
         function useExistingCustomer() {
             if (selectedCustomer) {
+                document.getElementById('newCustomerInfo').classList.add('hidden');
                 document.getElementById('pelanggan_id').value = selectedCustomer.id;
                 document.getElementById('nama_penyewa').value = selectedCustomer.nama;
                 document.getElementById('no_telepon').value = selectedCustomer.no_telepon;
@@ -1702,6 +1910,7 @@
         }
 
         function openNewCustomerForm() {
+            document.getElementById('newCustomerInfo').classList.remove('hidden');
             closeCekPelangganModal();
             document.getElementById('pelanggan_id').value = '';
             document.getElementById('nama_penyewa').value = '';
@@ -1712,16 +1921,13 @@
             document.getElementById('nama_penyewa').focus();
         }
 
-        // ==================== SWITCH TAB ====================
         function switchTab(tab) {
             currentTab = tab;
             currentPage = 1;
-
-            const aktifBtn = document.getElementById('tabAktifBtn');
-            const riwayatBtn = document.getElementById('tabRiwayatBtn');
-            const activeClasses = ['bg-white', 'text-indigo-600', 'shadow-sm', 'border-slate-200/50'];
-            const inactiveClasses = ['text-slate-500'];
-
+            const aktifBtn = document.getElementById('tabAktifBtn'),
+                riwayatBtn = document.getElementById('tabRiwayatBtn');
+            const activeClasses = ['bg-white', 'text-indigo-600', 'shadow-sm', 'border-slate-200/50'],
+                inactiveClasses = ['text-slate-500'];
             if (tab === 'aktif') {
                 aktifBtn?.classList.add(...activeClasses);
                 aktifBtn?.classList.remove(...inactiveClasses);
@@ -1736,12 +1942,9 @@
             fetchData();
         }
 
-        // ==================== EVENT LISTENERS & INITIALIZE ====================
         document.addEventListener('DOMContentLoaded', () => {
             loadBarang();
             fetchData();
-
-            // Filter listeners
             document.getElementById('filterSort')?.addEventListener('change', (e) => {
                 currentFilters.sort = e.target.value;
                 currentPage = 1;
@@ -1760,8 +1963,6 @@
                     fetchData();
                 }, 500);
             });
-
-            // Autocomplete
             document.getElementById('searchPelanggan')?.addEventListener('input', (e) => {
                 clearTimeout(searchTimeout);
                 if (e.target.value.length < 2) {
@@ -1770,15 +1971,17 @@
                 }
                 searchTimeout = setTimeout(() => searchPelangganAutocomplete(e.target.value), 300);
             });
+            document.getElementById('tanggal_sewa')?.addEventListener('change', () => hitungOtomatis());
+            document.getElementById('diskon')?.addEventListener('input', () => hitungOtomatis());
+            attachBarangChangeEvent();
 
-            // Form submits
             document.getElementById('formPeminjaman')?.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const formData = new FormData(e.target);
                 const barang = [];
                 document.querySelectorAll('#barangContainer .barang-row').forEach(row => {
-                    const id = row.querySelector('[name*="[id]"]')?.value;
-                    const jumlah = row.querySelector('[name*="[jumlah]"]')?.value;
+                    const id = row.querySelector('[name*="[id]"]')?.value,
+                        jumlah = row.querySelector('[name*="[jumlah]"]')?.value;
                     if (id && jumlah) barang.push({
                         id: parseInt(id),
                         jumlah: parseInt(jumlah)
@@ -1788,35 +1991,15 @@
                     showToast('Pilih minimal satu barang', 'error');
                     return;
                 }
-
-                const data = {
-                    nama_penyewa: formData.get('nama_penyewa'),
-                    no_telepon: formData.get('no_telepon'),
-                    customer_whatsapp: formData.get('no_telepon'),
-                    email: formData.get('email'),
-                    alamat: formData.get('alamat'),
-                    tipe_pelanggan: formData.get('tipe_pelanggan'),
-                    nama_acara: formData.get('nama_acara'),
-                    lokasi_acara: formData.get('lokasi_acara'),
-                    tanggal_sewa: formData.get('tanggal_sewa'),
-                    tanggal_kembali: formData.get('tanggal_kembali'),
-                    waktu_sewa: formData.get('waktu_sewa'),
-                    waktu_kembali: formData.get('waktu_kembali'),
-                    diskon: formData.get('diskon'),
-                    status_pembayaran: formData.get('status_pembayaran'),
-                    keterangan: formData.get('keterangan'),
-                    pelanggan_id: formData.get('pelanggan_id'),
-                    barang
-                };
+                formData.append('barang', JSON.stringify(barang));
                 try {
                     const response = await fetch('/peminjaman', {
                         method: 'POST',
                         headers: {
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
-                                .content,
-                            'Content-Type': 'application/json'
+                                .content
                         },
-                        body: JSON.stringify(data)
+                        body: formData
                     });
                     const result = await response.json();
                     if (result.success) {
@@ -1836,8 +2019,8 @@
                 const id = document.getElementById('edit_id').value;
                 const barang = [];
                 document.querySelectorAll('#editBarangContainer .barang-row').forEach(row => {
-                    const idBarang = row.querySelector('[name*="[id]"]')?.value;
-                    const jumlah = row.querySelector('[name*="[jumlah]"]')?.value;
+                    const idBarang = row.querySelector('[name*="[id]"]')?.value,
+                        jumlah = row.querySelector('[name*="[jumlah]"]')?.value;
                     if (idBarang && jumlah) barang.push({
                         id: parseInt(idBarang),
                         jumlah: parseInt(jumlah)
@@ -1847,7 +2030,6 @@
                     showToast('Pilih minimal satu barang', 'error');
                     return;
                 }
-
                 const data = {
                     nama_penyewa: document.getElementById('edit_nama_penyewa').value,
                     no_telepon: document.getElementById('edit_no_telepon').value,
@@ -1912,12 +2094,10 @@
                 }
             });
 
-            // Dropzone
-            const dropzone = document.getElementById('dropzonePengembalian');
-            const fileInput = document.getElementById('fotoPengembalian');
-            const preview = document.getElementById('previewPengembalian');
-            const previewImg = document.getElementById('previewImgPengembalian');
-
+            const dropzone = document.getElementById('dropzonePengembalian'),
+                fileInput = document.getElementById('fotoPengembalian'),
+                preview = document.getElementById('previewPengembalian'),
+                previewImg = document.getElementById('previewImgPengembalian');
             if (dropzone && fileInput) {
                 dropzone.addEventListener('click', () => fileInput.click());
                 dropzone.addEventListener('dragover', (e) => {
