@@ -157,10 +157,6 @@
                             class="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-[#cfe1f4]/30 transition-colors">
                             <i class="fas fa-user-circle text-[#4d7cbf]"></i> Profile
                         </a>
-                        <a href="#"
-                            class="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-[#cfe1f4]/30 transition-colors">
-                            <i class="fas fa-cog text-[#4d7cbf]"></i> Settings
-                        </a>
                         <hr class="my-1 border-[#cfe1f4]">
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
