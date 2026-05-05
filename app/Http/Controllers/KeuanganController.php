@@ -9,6 +9,7 @@ use App\Models\DetailPeminjaman;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class KeuanganController extends Controller
 {
@@ -321,4 +322,41 @@ class KeuanganController extends Controller
 
         return view('keuangan.laba', compact('pendapatan', 'pengeluaran', 'laba', 'bulan', 'tahun'));
     }
+
+    
+    // buat pdfff
+    public function cetakPdf(Request $request)
+    {
+        $bulan = $request->bulan ?? date('m');
+        $tahun = $request->tahun ?? date('Y');
+    
+        // Ambil data
+        $pendapatan = Keuangan::pendapatan()->dariSewa()
+            ->whereMonth('tanggal', $bulan)
+            ->whereYear('tanggal', $tahun)
+            ->get();
+    
+        $pengeluaran = Keuangan::pengeluaran()
+            ->whereMonth('tanggal', $bulan)
+            ->whereYear('tanggal', $tahun)
+            ->get();
+    
+        $totalPendapatan = $pendapatan->sum('jumlah');
+        $totalPengeluaran = $pengeluaran->sum('jumlah');
+        $laba = $totalPendapatan - $totalPengeluaran;
+    
+        // Kirim ke view PDF
+        $pdf = Pdf::loadView('keuangan.pdf', compact(
+            'pendapatan',
+            'pengeluaran',
+            'totalPendapatan',
+            'totalPengeluaran',
+            'laba',
+            'bulan',
+            'tahun'
+        ));
+    
+        return $pdf->download("laporan-keuangan-$bulan-$tahun.pdf");
+    }
+
 }

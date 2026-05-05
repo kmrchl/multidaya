@@ -24,6 +24,9 @@ Route::middleware(['guest'])->group(function () {
     Route::post('/login', [LoginController::class, 'login']);
 });
 
+// buat pdf
+Route::get('/keuangan/cetak', [KeuanganController::class, 'cetakPdf'])->name('keuangan.cetak');
+
 // Authenticated routes (memerlukan login)
 Route::middleware(['auth'])->group(function () {
 

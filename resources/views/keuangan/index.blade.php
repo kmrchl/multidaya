@@ -322,6 +322,7 @@
                         <select name="sumber" id="sumber" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent">
                             <option value="operasional">Operasional</option>
                             <option value="promosi">Promosi</option>
+                            
                             <option value="inventaris">Inventaris / Stok Barang</option>
                         </select>
                     </div>
@@ -524,7 +525,12 @@ document.getElementById('formBiaya').addEventListener('submit', async (e) => {
     }
 });
 
-function cetakLaporan() { window.print(); }
+function cetakLaporan() {
+    const bulan = document.getElementById('bulanSelect').value;
+    const tahun = document.getElementById('tahunSelect').value;
+
+    window.open(`/keuangan/cetak?bulan=${bulan}&tahun=${tahun}`, '_blank');
+}
 
 function showToast(message, type) {
     const toast = document.getElementById('toast');
