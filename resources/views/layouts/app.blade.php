@@ -11,6 +11,10 @@
     <link rel="shortcut icon" href="{{ asset('images/logo.png') }}">
     <link rel="apple-touch-icon" href="{{ asset('images/logo.png') }}">
 
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}">
+    <link rel="shortcut icon" type="image/png" href="{{ asset('images/logo.png') }}">
+
     <!-- Tailwind CSS v3 + Font Awesome 6 + Google Fonts Inter -->
     @vite(['resources/css/app.css'])
     <script src="https://cdn.tailwindcss.com"></script>

@@ -14,6 +14,10 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
+Route::get('/test', function () {
+    return response()->json(['message' => 'OK']);
+});
+
 Route::get('/', function () {
     return redirect()->route('dashboard');
 });
@@ -23,9 +27,6 @@ Route::middleware(['guest'])->group(function () {
     Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [LoginController::class, 'login']);
 });
-
-// buat pdf
-Route::get('/keuangan/cetak', [KeuanganController::class, 'cetakPdf'])->name('keuangan.cetak');
 
 // Authenticated routes (memerlukan login)
 Route::middleware(['auth'])->group(function () {
@@ -52,7 +53,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/', [PeminjamanController::class, 'index'])->name('index');
         Route::post('/', [PeminjamanController::class, 'store'])->name('store');
         Route::get('/{id}', [PeminjamanController::class, 'show'])->name('show');
-        Route::put('/{id}', [PeminjamanController::class, 'update'])->name('update'); // EDIT
+        Route::put('/{id}', [PeminjamanController::class, 'update'])->name('update');
         Route::put('/{id}/pengembalian', [PeminjamanController::class, 'pengembalian'])->name('pengembalian');
         Route::post('/{id}/upload-bukti', [PeminjamanController::class, 'uploadBukti'])->name('upload-bukti');
         Route::get('/{id}/invoice', [PeminjamanController::class, 'generateInvoice'])->name('invoice');
@@ -62,6 +63,17 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/{id}/send-pengiriman', [PeminjamanController::class, 'sendPengirimanNotification'])->name('send-pengiriman');
         Route::post('/{id}/send-pengingat', [PeminjamanController::class, 'sendPengingatPengembalian'])->name('send-pengingat');
     });
+
+
+        // Customer Check Routes (CEK PELANGGAN) - Letakkan di DALAM group
+        Route::post('/cek-pelanggan', [PeminjamanController::class, 'cekPelanggan'])->name('cek-pelanggan');
+        Route::get('/pelanggan-list', [PeminjamanController::class, 'getPelangganList'])->name('pelanggan-list');
+
+
+    // ==================== API ROUTES UNTUK CEK PELANGGAN (DI LUAR GROUP) ====================
+    // Atau pakai prefix api
+    Route::get('/api/pelanggan/list', [PeminjamanController::class, 'getPelangganList'])->name('api.pelanggan.list');
+    Route::post('/api/pelanggan/cek', [PeminjamanController::class, 'cekPelanggan'])->name('api.pelanggan.cek');
 
     // ==================== BARANG ROUTES ====================
     Route::prefix('barang')->name('barang.')->group(function () {
@@ -76,6 +88,7 @@ Route::middleware(['auth'])->group(function () {
     });
 
     // ==================== KEUANGAN ROUTES ====================
+
     Route::prefix('keuangan')->name('keuangan.')->group(function () {
         Route::get('/', [KeuanganController::class, 'index'])->name('index');
         Route::post('/', [KeuanganController::class, 'store'])->name('store');
@@ -89,7 +102,14 @@ Route::middleware(['auth'])->group(function () {
     });
 
     // ==================== API ROUTES (untuk dropdown) ====================
-    Route::get('/api/barang-tersedia', function () {
+        Route::get('/{id}', [KeuanganController::class, 'show'])->name('show');
+        Route::get('/riwayat-json', [KeuanganController::class, 'getRiwayatByDate'])->name('riwayat.json');
+        Route::get('/export', [KeuanganController::class, 'export'])->name('export');
+        Route::get('/laporan-lab-rugi', [KeuanganController::class, 'laporanLabaRugi'])->name('laporan-lab-rugi');
+    
+
+    // ==================== API ROUTES ====================
+        Route::get('/api/barang-tersedia', function () {
         return response()->json(
             App\Models\Barang::where('status', 'aktif')
                 ->where('tersedia', '>', 0)
@@ -106,5 +126,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/recommendations', [DashboardController::class, 'getRecommendations'])->name('recommendations');
     Route::post('/recommendations/accept', [DashboardController::class, 'acceptRecommendation'])->name('recommendations.accept');
     Route::get('/recommendations/refresh', [DashboardController::class, 'refreshRecommendations'])->name('recommendations.refresh');
-});
 
+
+
+});

@@ -15,7 +15,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class PeminjamanController extends Controller
 {
-    protected $whatsappService;
+    protected WhatsAppService $whatsappService;
 
     public function __construct(WhatsAppService $whatsappService)
     {
@@ -27,7 +27,7 @@ class PeminjamanController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Peminjaman::with('details');
+        $query = Peminjaman::with(['details', 'pelanggan']);
 
         // Filter status
         if ($request->status == 'aktif') {
@@ -36,6 +36,17 @@ class PeminjamanController extends Controller
             $query->where('status_pengembalian', 'selesai');
         } elseif ($request->status == 'terlambat') {
             $query->where('status_pengembalian', 'terlambat');
+        }
+
+        // Filter pelanggan baru/lama
+        if ($request->pelanggan == 'new') {
+            $query->whereHas('pelanggan', function ($q) {
+                $q->where('total_transaksi', '<=', 1);
+            });
+        } elseif ($request->pelanggan == 'old') {
+            $query->whereHas('pelanggan', function ($q) {
+                $q->where('total_transaksi', '>', 1);
+            });
         }
 
         // Search
@@ -61,11 +72,8 @@ class PeminjamanController extends Controller
         }
 
         $peminjaman = $query->paginate(10);
-
-        // Get available barang for form
         $barang = Barang::where('status', 'aktif')->where('tersedia', '>', 0)->get();
 
-        // Jika request AJAX, return JSON
         if ($request->ajax()) {
             return response()->json([
                 'data' => $peminjaman->items(),
@@ -92,6 +100,9 @@ class PeminjamanController extends Controller
             'nama_penyewa' => 'required|string|max:255',
             'no_telepon' => 'required|string|max:15',
             'customer_whatsapp' => 'nullable|string|max:15',
+            'email' => 'nullable|email|max:255',
+            'alamat' => 'nullable|string',
+            'tipe_pelanggan' => 'nullable|in:perorangan,perusahaan',
             'nama_acara' => 'nullable|string|max:255',
             'lokasi_acara' => 'nullable|string',
             'tanggal_sewa' => 'required|date',
@@ -105,6 +116,27 @@ class PeminjamanController extends Controller
 
         DB::beginTransaction();
         try {
+            $pelanggan = null;
+            $isNewCustomer = false;
+
+            if ($request->pelanggan_id) {
+                $pelanggan = Pelanggan::find($request->pelanggan_id);
+            } elseif ($request->no_telepon) {
+                $pelanggan = Pelanggan::where('no_telepon', $request->no_telepon)->first();
+            }
+
+            if (!$pelanggan) {
+                $pelanggan = Pelanggan::create([
+                    'nama' => $request->nama_penyewa,
+                    'no_telepon' => $request->no_telepon,
+                    'email' => $request->email ?? null,
+                    'alamat' => $request->alamat ?? null,
+                    'tipe' => $request->tipe_pelanggan ?? 'perorangan',
+                    'status' => 'aktif'
+                ]);
+                $isNewCustomer = true;
+            }
+
             $totalHarga = 0;
             $details = [];
 
@@ -114,7 +146,6 @@ class PeminjamanController extends Controller
                     throw new \Exception('Barang tidak ditemukan');
                 }
 
-                // Cek ketersediaan stok
                 if ($barang->tersedia < $item['jumlah']) {
                     throw new \Exception('Stok barang ' . $barang->nama_barang . ' tidak mencukupi (Tersedia: ' . $barang->tersedia . ')');
                 }
@@ -131,15 +162,23 @@ class PeminjamanController extends Controller
                     'subtotal' => $subtotal
                 ];
 
-                // Update stock
                 $barang->decrement('tersedia', $item['jumlah']);
                 $barang->increment('disewa', $item['jumlah']);
             }
 
             $grandTotal = $totalHarga - ($request->diskon ?? 0);
 
+            // === FITUR BARU: Hitung PPN 11% ===
+            $ppn = 0.11; // 11%
+            $totalPpn = $grandTotal * $ppn;
+            $grandTotalWithPpn = $grandTotal + $totalPpn;
+
+            // === FITUR BARU: Hitung Jatuh Tempo (tanggal sewa + 7 hari) ===
+            $jatuhTempo = date('Y-m-d', strtotime($request->tanggal_sewa . ' +7 days'));
+
             $peminjaman = Peminjaman::create([
                 'invoice_number' => Peminjaman::generateInvoiceNumber(),
+                'pelanggan_id' => $pelanggan->id,
                 'nama_penyewa' => $request->nama_penyewa,
                 'no_telepon' => $request->no_telepon,
                 'customer_whatsapp' => $request->customer_whatsapp ?? $request->no_telepon,
@@ -154,9 +193,17 @@ class PeminjamanController extends Controller
                 'total_harga' => $totalHarga,
                 'diskon' => $request->diskon ?? 0,
                 'grand_total' => $grandTotal,
+                // === FITUR BARU ===
+                'ppn' => $ppn,
+                'total_ppn' => $totalPpn,
+                'grand_total_with_ppn' => $grandTotalWithPpn,
+                'jatuh_tempo_pembayaran' => $jatuhTempo,
                 'keterangan' => $request->keterangan,
                 'created_by' => Auth::id()
             ]);
+
+            $pelanggan->increment('total_transaksi');
+            $pelanggan->increment('total_nilai_transaksi', $grandTotalWithPpn);
 
             foreach ($details as $detail) {
                 $detail['peminjaman_id'] = $peminjaman->id;
@@ -165,7 +212,6 @@ class PeminjamanController extends Controller
 
             DB::commit();
 
-            // Kirim notifikasi pengiriman secara otomatis
             try {
                 $this->whatsappService->sendPengirimanNotification($peminjaman);
                 $peminjaman->update(['whatsapp_sent_pengiriman' => true]);
@@ -175,8 +221,9 @@ class PeminjamanController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Peminjaman berhasil ditambahkan',
-                'data' => $peminjaman
+                'message' => $isNewCustomer ? 'Peminjaman berhasil ditambahkan (Pelanggan baru)' : 'Peminjaman berhasil ditambahkan',
+                'data' => $peminjaman,
+                'is_new_customer' => $isNewCustomer
             ]);
         } catch (\Exception $e) {
             DB::rollback();
@@ -190,19 +237,31 @@ class PeminjamanController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($id)
+    public function show(string $id)
     {
-        $peminjaman = Peminjaman::with('details')->findOrFail($id);
+        $peminjaman = Peminjaman::with(['details', 'pelanggan'])->findOrFail($id);
+
+        // Format tanggal untuk frontend
+        $data = $peminjaman->toArray();
+        $data['tanggal_sewa'] = date('Y-m-d', strtotime($peminjaman->tanggal_sewa));
+        $data['tanggal_kembali'] = date('Y-m-d', strtotime($peminjaman->tanggal_kembali));
+
+        // Pastikan field baru tersedia
+        $data['ppn'] = $peminjaman->ppn ?? 0.11;
+        $data['total_ppn'] = $peminjaman->total_ppn ?? 0;
+        $data['grand_total_with_ppn'] = $peminjaman->grand_total_with_ppn ?? $peminjaman->grand_total;
+        $data['jatuh_tempo_pembayaran'] = $peminjaman->jatuh_tempo_pembayaran;
+
         return response()->json([
             'success' => true,
-            'data' => $peminjaman
+            'data' => $data
         ]);
     }
 
     /**
      * Process pengembalian barang.
      */
-    public function pengembalian(Request $request, $id)
+    public function pengembalian(Request $request, string $id)
     {
         $peminjaman = Peminjaman::findOrFail($id);
 
@@ -216,12 +275,10 @@ class PeminjamanController extends Controller
 
         DB::beginTransaction();
         try {
-            // Hitung denda keterlambatan
             $tanggalKembali = new \DateTime($peminjaman->tanggal_kembali);
             $today = new \DateTime();
             $selisihHari = $today > $tanggalKembali ? $today->diff($tanggalKembali)->days : 0;
             $dendaKeterlambatan = $selisihHari * 50000;
-
             $totalDenda = $dendaKeterlambatan + ($request->biaya_kerusakan ?? 0);
 
             $updateData = [
@@ -241,7 +298,6 @@ class PeminjamanController extends Controller
 
             $peminjaman->update($updateData);
 
-            // Update stok barang (kembalikan ke tersedia)
             foreach ($peminjaman->details as $detail) {
                 $barang = Barang::find($detail->barang_id);
                 if ($barang) {
@@ -273,7 +329,7 @@ class PeminjamanController extends Controller
     /**
      * Upload bukti pembayaran.
      */
-    public function uploadBukti(Request $request, $id)
+    public function uploadBukti(Request $request, string $id)
     {
         $request->validate([
             'bukti_pembayaran' => 'required|image|mimes:jpg,jpeg,png|max:2048'
@@ -283,19 +339,24 @@ class PeminjamanController extends Controller
 
         DB::beginTransaction();
         try {
+            $path = null;
             if ($request->hasFile('bukti_pembayaran')) {
+                // Hapus file lama jika ada
+                if ($peminjaman->bukti_pembayaran && file_exists(storage_path('app/public/' . $peminjaman->bukti_pembayaran))) {
+                    unlink(storage_path('app/public/' . $peminjaman->bukti_pembayaran));
+                }
+
                 $path = $request->file('bukti_pembayaran')->store('bukti_pembayaran', 'public');
                 $peminjaman->update([
                     'bukti_pembayaran' => $path,
                     'status_pembayaran' => 'dp'
                 ]);
             }
-
             DB::commit();
-
             return response()->json([
                 'success' => true,
-                'message' => 'Bukti pembayaran berhasil diupload'
+                'message' => 'Bukti pembayaran berhasil diupload',
+                'bukti_pembayaran_url' => asset("storage/{$path}")
             ]);
         } catch (\Exception $e) {
             DB::rollback();
@@ -309,11 +370,10 @@ class PeminjamanController extends Controller
     /**
      * Generate invoice PDF.
      */
-    public function generateInvoice($id)
+    public function generateInvoice(string $id)
     {
         try {
-            $peminjaman = Peminjaman::with('details')->findOrFail($id);
-
+            $peminjaman = Peminjaman::with(['details', 'pelanggan'])->findOrFail($id);
             $data = [
                 'peminjaman' => $peminjaman,
                 'company' => [
@@ -323,13 +383,9 @@ class PeminjamanController extends Controller
                     'email' => 'info@multidaya.com'
                 ]
             ];
-
             $pdf = Pdf::loadView('peminjaman.invoice', $data);
             $pdf->setPaper('a4', 'portrait');
-
-            // Gunakan ID sebagai nama file (aman tanpa karakter khusus)
             $filename = 'invoice_' . $peminjaman->id . '_' . date('Ymd') . '.pdf';
-
             return $pdf->download($filename);
         } catch (\Exception $e) {
             return response()->json([
@@ -338,19 +394,14 @@ class PeminjamanController extends Controller
             ], 500);
         }
     }
-    public function pelanggan()
-    {
-        return $this->belongsTo(Pelanggan::class);
-    }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, string $id)
     {
         $peminjaman = Peminjaman::findOrFail($id);
 
-        // Cek apakah peminjaman sudah selesai
         if ($peminjaman->status_pengembalian == 'selesai') {
             return response()->json([
                 'success' => false,
@@ -375,7 +426,7 @@ class PeminjamanController extends Controller
 
         DB::beginTransaction();
         try {
-            // 1. Kembalikan stok barang lama
+            // Kembalikan stok barang lama
             foreach ($peminjaman->details as $detail) {
                 $barangLama = Barang::find($detail->barang_id);
                 if ($barangLama) {
@@ -384,10 +435,9 @@ class PeminjamanController extends Controller
                 }
             }
 
-            // 2. Hapus detail lama
+            // Hapus detail lama
             DetailPeminjaman::where('peminjaman_id', $peminjaman->id)->delete();
 
-            // 3. Hitung total harga baru
             $totalHarga = 0;
             $details = [];
 
@@ -397,7 +447,6 @@ class PeminjamanController extends Controller
                     throw new \Exception('Barang tidak ditemukan');
                 }
 
-                // Cek ketersediaan stok baru
                 if ($barang->tersedia < $item['jumlah']) {
                     throw new \Exception('Stok barang ' . $barang->nama_barang . ' tidak mencukupi (Tersedia: ' . $barang->tersedia . ')');
                 }
@@ -414,14 +463,20 @@ class PeminjamanController extends Controller
                     'subtotal' => $subtotal
                 ];
 
-                // Update stock baru
                 $barang->decrement('tersedia', $item['jumlah']);
                 $barang->increment('disewa', $item['jumlah']);
             }
 
             $grandTotal = $totalHarga - ($request->diskon ?? 0);
 
-            // 4. Update peminjaman
+            // === FITUR BARU: Hitung PPN 11% ===
+            $ppn = 0.11; // 11%
+            $totalPpn = $grandTotal * $ppn;
+            $grandTotalWithPpn = $grandTotal + $totalPpn;
+
+            // === FITUR BARU: Hitung Jatuh Tempo (tanggal sewa + 7 hari) ===
+            $jatuhTempo = date('Y-m-d', strtotime($request->tanggal_sewa . ' +7 days'));
+
             $peminjaman->update([
                 'nama_penyewa' => $request->nama_penyewa,
                 'no_telepon' => $request->no_telepon,
@@ -436,10 +491,14 @@ class PeminjamanController extends Controller
                 'total_harga' => $totalHarga,
                 'diskon' => $request->diskon ?? 0,
                 'grand_total' => $grandTotal,
+                // === FITUR BARU ===
+                'ppn' => $ppn,
+                'total_ppn' => $totalPpn,
+                'grand_total_with_ppn' => $grandTotalWithPpn,
+                'jatuh_tempo_pembayaran' => $jatuhTempo,
                 'keterangan' => $request->keterangan
             ]);
 
-            // 5. Tambah detail baru
             foreach ($details as $detail) {
                 $detail['peminjaman_id'] = $peminjaman->id;
                 DetailPeminjaman::create($detail);
@@ -471,14 +530,11 @@ class PeminjamanController extends Controller
         ]);
 
         $keyword = $request->keyword;
-
-        // Cari pelanggan berdasarkan nama atau no telepon
         $pelanggan = Pelanggan::where('nama', 'like', "%{$keyword}%")
             ->orWhere('no_telepon', 'like', "%{$keyword}%")
             ->first();
 
         if ($pelanggan) {
-            // Ambil riwayat peminjaman
             $riwayat = $pelanggan->peminjaman()
                 ->with('details')
                 ->orderBy('created_at', 'desc')
@@ -494,7 +550,6 @@ class PeminjamanController extends Controller
             ]);
         }
 
-        // Cari pelanggan yang mirip (suggestions)
         $suggestions = Pelanggan::where('nama', 'like', "%{$keyword}%")
             ->orWhere('no_telepon', 'like', "%{$keyword}%")
             ->limit(5)
@@ -508,13 +563,13 @@ class PeminjamanController extends Controller
     }
 
     /**
-     * Get all pelanggan (untuk autocomplete)
+     * Get all pelanggan for autocomplete
      */
     public function getPelangganList(Request $request)
     {
         $query = Pelanggan::query();
 
-        if ($request->search) {
+        if ($request->search && strlen($request->search) >= 2) {
             $query->where('nama', 'like', "%{$request->search}%")
                 ->orWhere('no_telepon', 'like', "%{$request->search}%");
         }
@@ -530,7 +585,7 @@ class PeminjamanController extends Controller
     /**
      * Kirim notifikasi pengiriman ke pelanggan
      */
-    public function sendPengirimanNotification($id)
+    public function sendPengirimanNotification(string $id)
     {
         $peminjaman = Peminjaman::with('details')->findOrFail($id);
 
@@ -544,10 +599,7 @@ class PeminjamanController extends Controller
         $result = $this->whatsappService->sendPengirimanNotification($peminjaman);
 
         if ($result['success']) {
-            $peminjaman->update([
-                'whatsapp_sent_pengiriman' => true
-            ]);
-
+            $peminjaman->update(['whatsapp_sent_pengiriman' => true]);
             return response()->json([
                 'success' => true,
                 'message' => 'Notifikasi pengiriman berhasil dikirim'
@@ -563,7 +615,7 @@ class PeminjamanController extends Controller
     /**
      * Kirim pengingat pengembalian manual
      */
-    public function sendPengingatPengembalian($id)
+    public function sendPengingatPengembalian(string $id)
     {
         $peminjaman = Peminjaman::findOrFail($id);
 
@@ -574,7 +626,6 @@ class PeminjamanController extends Controller
                 'whatsapp_sent_pengingat' => true,
                 'whatsapp_pengingat_sent_at' => now()
             ]);
-
             return response()->json([
                 'success' => true,
                 'message' => 'Pengingat pengembalian berhasil dikirim'
@@ -590,13 +641,12 @@ class PeminjamanController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
+    public function destroy(string $id)
     {
         $peminjaman = Peminjaman::findOrFail($id);
 
         DB::beginTransaction();
         try {
-            // Restore stock jika status masih aktif
             if ($peminjaman->status_pengembalian == 'aktif') {
                 foreach ($peminjaman->details as $detail) {
                     $barang = Barang::find($detail->barang_id);
@@ -606,10 +656,8 @@ class PeminjamanController extends Controller
                     }
                 }
             }
-
             $peminjaman->delete();
             DB::commit();
-
             return response()->json([
                 'success' => true,
                 'message' => 'Peminjaman berhasil dihapus'

@@ -2,12 +2,16 @@
 
 namespace Database\Seeders;
 
+<<<<<<< HEAD
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+=======
+>>>>>>> origin/main
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
+<<<<<<< HEAD
     use WithoutModelEvents;
 
     /**
@@ -20,6 +24,13 @@ class DatabaseSeeder extends Seeder
         User::factory()->create([
             'name' => 'Test User',
             'email' => 'test@example.com',
+=======
+    public function run(): void
+    {
+        $this->call([
+            BarangSeeder::class,
+            PeminjamanSeeder::class,
+>>>>>>> origin/main
         ]);
     }
 }
