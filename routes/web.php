@@ -87,18 +87,29 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/{id}/stock', [BarangController::class, 'updateStock'])->name('update-stock');
     });
 
-    // ==================== KEUANGAN ROUTES ====================
+ // ==================== KEUANGAN ROUTES ====================
 
     Route::prefix('keuangan')->name('keuangan.')->group(function () {
+
+        // Dashboard
         Route::get('/', [KeuanganController::class, 'index'])->name('index');
+
+        // CRUD
         Route::post('/', [KeuanganController::class, 'store'])->name('store');
         Route::delete('/{id}', [KeuanganController::class, 'destroy'])->name('destroy');
-        Route::get('/laporan-lab-rugi', [KeuanganController::class, 'laporanLabaRugi'])->name('laporan-lab-rugi');
 
-        Route::get('/pendapatan', [KeuanganController::class, 'pendapatan'])->name('keuangan.pendapatan');
-        Route::get('/pengeluaran', [KeuanganController::class, 'pengeluaran'])->name('keuangan.pengeluaran');
-        Route::get('/laba', [KeuanganController::class, 'laba'])->name('keuangan.laba');
-        Route::delete('/{id}', [KeuanganController::class, 'destroy']);
+        // Detail laporan
+        Route::get('/pendapatan', [KeuanganController::class, 'pendapatan'])->name('pendapatan');
+        Route::get('/pengeluaran', [KeuanganController::class, 'pengeluaran'])->name('pengeluaran');
+        Route::get('/laba', [KeuanganController::class, 'laba'])->name('laba');
+
+        // AJAX
+        Route::get('/riwayat-json', [KeuanganController::class, 'getRiwayatByDate'])->name('riwayat.json');
+
+        // DETAIL BY ID
+        Route::get('/detail/{id}', [KeuanganController::class, 'show'])
+            ->whereNumber('id')
+            ->name('show');
     });
 
     // ==================== API ROUTES (untuk dropdown) ====================

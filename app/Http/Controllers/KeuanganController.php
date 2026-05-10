@@ -3,6 +3,8 @@
 
 namespace App\Http\Controllers;
 
+
+use App\Models\Keuangan;
 use App\Models\BiayaOperasional;
 use App\Models\Peminjaman;
 use Illuminate\Http\Request;
@@ -13,16 +15,18 @@ class KeuanganController extends Controller
 {
     public function index(Request $request)
     {
-        $bulan = $request->get('bulan', date('m'));
-        $tahun = $request->get('tahun', date('Y'));
+        $bulan = (int) $request->get('bulan', date('m'));
+        $tahun = (int) $request->get('tahun', date('Y'));
 
-        // Data Pendapatan dari peminjaman (dengan PPN)
-        $pendapatan = Peminjaman::whereYear('created_at', $tahun)
-            ->whereMonth('created_at', $bulan)
-            ->sum(DB::raw('grand_total'));
+        // Pendapatan
+        $pendapatan = Keuangan::pendapatan()
+            ->whereYear('tanggal', $tahun)
+            ->whereMonth('tanggal', $bulan)
+            ->sum('jumlah');
 
-        // Data Pengeluaran dari biaya operasional
-        $pengeluaran = BiayaOperasional::whereYear('tanggal', $tahun)
+        // Pengeluaran
+        $pengeluaran = Keuangan::pengeluaran()
+            ->whereYear('tanggal', $tahun)
             ->whereMonth('tanggal', $bulan)
             ->sum('jumlah');
 
@@ -227,4 +231,92 @@ class KeuanganController extends Controller
             'total' => $riwayat->sum('jumlah')
         ]);
     }
+
+    public function show($id)
+    {
+        try {
+            $biaya = BiayaOperasional::with('creator')->findOrFail($id);
+
+            return response()->json([
+                'success' => true,
+                'data' => $biaya
+            ]);
+
+        } catch (\Exception $e) {
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Data tidak ditemukan'
+            ], 404);
+        }
+    }
+
+    public function pendapatan(Request $request)
+    {
+        $bulan = (int) $request->get('bulan', date('m'));
+        $tahun = (int) $request->get('tahun', date('Y'));
+
+        $data = Keuangan::pendapatan()
+            ->whereYear('tanggal', $tahun)
+            ->whereMonth('tanggal', $bulan)
+            ->latest('tanggal')
+            ->get();
+
+        $total = $data->sum('jumlah');
+
+        return view('keuangan.pendapatan', compact(
+            'data',
+            'bulan',
+            'tahun',
+            'total'
+        ));
+    }
+
+    public function pengeluaran(Request $request)
+    {
+        $bulan = (int) $request->get('bulan', date('m'));
+        $tahun = (int) $request->get('tahun', date('Y'));
+
+        $data = Keuangan::pengeluaran()
+            ->whereYear('tanggal', $tahun)
+            ->whereMonth('tanggal', $bulan)
+            ->latest('tanggal')
+            ->get();
+
+        $total = $data->sum('jumlah');
+
+        return view('keuangan.pengeluaran', compact(
+            'data',
+            'bulan',
+            'tahun',
+            'total'
+        ));
+    }
+
+    public function laba(Request $request)
+    {
+        $bulan = (int) $request->get('bulan', date('m'));
+        $tahun = (int) $request->get('tahun', date('Y'));
+
+        $pendapatan = Keuangan::pendapatan()
+            ->whereYear('tanggal', $tahun)
+            ->whereMonth('tanggal', $bulan)
+            ->sum('jumlah');
+
+        $pengeluaran = Keuangan::pengeluaran()
+            ->whereYear('tanggal', $tahun)
+            ->whereMonth('tanggal', $bulan)
+            ->sum('jumlah');
+
+        $laba = $pendapatan - $pengeluaran;
+
+        return view('keuangan.laba', compact(
+            'bulan',
+            'tahun',
+            'pendapatan',
+            'pengeluaran',
+            'laba'
+        ));
+    }
+        
 }

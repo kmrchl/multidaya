@@ -43,70 +43,85 @@
 
         {{-- ==================== STATS CARDS ==================== --}}
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+
             {{-- Card Pendapatan --}}
-            <div onclick="filterByPendapatan()"
-                class="group bg-white rounded-4xl p-6 border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-emerald-500/10 transition-all duration-300 transform hover:-translate-y-1 cursor-pointer">
-                <div class="flex items-start justify-between">
-                    <div class="space-y-3">
-                        <div class="flex items-center gap-2">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Pendapatan Sewa</p>
-                        </div>
-                        <p class="text-2xl sm:text-3xl font-black text-slate-800 tracking-tight">
-                            Rp {{ number_format($totalPendapatan, 0, ',', '.') }}
+        <div onclick="goToLaporan('pendapatan')"
+            class="group bg-white rounded-4xl p-6 border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-emerald-500/10 transition-all duration-300 transform hover:-translate-y-1 cursor-pointer">
+            <div class="flex items-start justify-between">
+                <div class="space-y-3">
+                    <div class="flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                            Pendapatan Sewa
                         </p>
-                        <div
-                            class="flex items-center gap-1.5 {{ $pendapatanGrowth >= 0 ? 'text-emerald-600' : 'text-rose-600' }} font-bold text-xs">
-                            <i class="fas {{ $pendapatanGrowth >= 0 ? 'fa-arrow-up' : 'fa-arrow-down' }}"></i>
-                            <span>{{ number_format(abs($pendapatanGrowth), 1) }}%</span>
-                            <span class="text-slate-400 font-medium italic">vs bln lalu</span>
-                        </div>
                     </div>
+
+                    <p class="text-2xl sm:text-3xl font-black text-slate-800 tracking-tight">
+                        Rp {{ number_format($totalPendapatan, 0, ',', '.') }}
+                    </p>
+
                     <div
-                        class="w-14 h-14 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-500 group-hover:bg-emerald-500 group-hover:text-white transition-all duration-500">
-                        <i class="fas fa-chart-line text-2xl"></i>
+                        class="flex items-center gap-1.5 {{ $pendapatanGrowth >= 0 ? 'text-emerald-600' : 'text-rose-600' }} font-bold text-xs">
+                        <i class="fas {{ $pendapatanGrowth >= 0 ? 'fa-arrow-up' : 'fa-arrow-down' }}"></i>
+                        <span>{{ number_format(abs($pendapatanGrowth), 1) }}%</span>
+                        <span class="text-slate-400 font-medium italic">vs bln lalu</span>
                     </div>
                 </div>
+
+                <div
+                    class="w-14 h-14 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-500 group-hover:bg-emerald-500 group-hover:text-white transition-all duration-500">
+                    <i class="fas fa-chart-line text-2xl"></i>
+                </div>
             </div>
+        </div>
 
             {{-- Card Total Biaya --}}
-            <div onclick="filterByBiaya()"
-                class="group bg-white rounded-4xl p-6 border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-rose-500/10 transition-all duration-300 transform hover:-translate-y-1 cursor-pointer">
-                <div class="flex items-start justify-between">
-                    <div class="space-y-3">
-                        <div class="flex items-center gap-2">
-                            <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
-                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Pengeluaran</p>
-                        </div>
-                        <p class="text-2xl sm:text-3xl font-black text-slate-800 tracking-tight">
-                            Rp {{ number_format($totalPengeluaran, 0, ',', '.') }}
+        <div onclick="goToLaporan('pengeluaran')"
+            class="group bg-white rounded-4xl p-6 border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-rose-500/10 transition-all duration-300 transform hover:-translate-y-1 cursor-pointer">
+            <div class="flex items-start justify-between">
+                <div class="space-y-3">
+                    <div class="flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                            Total Pengeluaran
                         </p>
-                        <div
-                            class="flex items-center gap-1.5 {{ $pengeluaranGrowth <= 0 ? 'text-emerald-600' : 'text-rose-600' }} font-bold text-xs">
-                            <i class="fas {{ $pengeluaranGrowth >= 0 ? 'fa-arrow-up' : 'fa-arrow-down' }}"></i>
-                            <span>{{ number_format(abs($pengeluaranGrowth), 1) }}%</span>
-                            <span class="text-slate-400 font-medium italic">vs bln lalu</span>
-                        </div>
                     </div>
+
+                    <p class="text-2xl sm:text-3xl font-black text-slate-800 tracking-tight">
+                        Rp {{ number_format($totalPengeluaran, 0, ',', '.') }}
+                    </p>
+
                     <div
-                        class="w-14 h-14 rounded-2xl bg-rose-50 flex items-center justify-center text-rose-500 group-hover:bg-rose-500 group-hover:text-white transition-all duration-500">
-                        <i class="fas fa-receipt text-2xl"></i>
+                        class="flex items-center gap-1.5 {{ $pengeluaranGrowth <= 0 ? 'text-emerald-600' : 'text-rose-600' }} font-bold text-xs">
+                        <i class="fas {{ $pengeluaranGrowth >= 0 ? 'fa-arrow-up' : 'fa-arrow-down' }}"></i>
+                        <span>{{ number_format(abs($pengeluaranGrowth), 1) }}%</span>
+                        <span class="text-slate-400 font-medium italic">vs bln lalu</span>
                     </div>
                 </div>
+
+                <div
+                    class="w-14 h-14 rounded-2xl bg-rose-50 flex items-center justify-center text-rose-500 group-hover:bg-rose-500 group-hover:text-white transition-all duration-500">
+                    <i class="fas fa-receipt text-2xl"></i>
+                </div>
             </div>
+        </div>
 
             {{-- Card Laba Bersih --}}
-            <div onclick="filterByLaba()"
+            <div onclick="goToLaporan('laba')"
                 class="group bg-white rounded-4xl p-6 border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-blue-500/10 transition-all duration-300 transform hover:-translate-y-1 cursor-pointer">
                 <div class="flex items-start justify-between">
                     <div class="space-y-3">
                         <div class="flex items-center gap-2">
                             <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
-                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Laba Bersih</p>
+                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                Laba Bersih
+                            </p>
                         </div>
+
                         <p class="text-2xl sm:text-3xl font-black text-blue-600 tracking-tight">
                             Rp {{ number_format($labaBersih, 0, ',', '.') }}
                         </p>
+
                         <div
                             class="flex items-center gap-1.5 {{ $labaGrowth >= 0 ? 'text-emerald-600' : 'text-rose-600' }} font-bold text-xs">
                             <i class="fas {{ $labaGrowth >= 0 ? 'fa-arrow-up' : 'fa-arrow-down' }}"></i>
@@ -114,6 +129,7 @@
                             <span class="text-slate-400 font-medium italic">vs bln lalu</span>
                         </div>
                     </div>
+
                     <div
                         class="w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-500 group-hover:bg-blue-500 group-hover:text-white transition-all duration-500">
                         <i class="fas fa-wallet text-2xl"></i>
@@ -320,14 +336,19 @@
                                     {{ number_format($biaya->jumlah, 0, ',', '.') }}</td>
                                 <td class="px-4 py-3 text-sm text-slate-500 text-center">{{ $biaya->referensi ?? '-' }}
                                 </td>
-                                <td class="px-4 py-3 text-center"><span
-                            
                                 <td class="px-4 py-3 text-center">
-                                    <button onclick="viewBiayaDetail({{ $biaya->id }})""><i
+                                <div class="flex items-center justify-center gap-2">
+                                    <button onclick="viewBiayaDetail({{ $biaya->id }})"
+                                        class="text-blue-600 hover:text-blue-800 p-1">
+                                        <i class="fas fa-eye text-sm"></i>
+                                    </button>
+
                                     <button onclick="deleteBiaya({{ $biaya->id }})"
-                                        class="text-red-600 hover:text-red-800 p-1"><i
-                                            class="fas fa-trash text-sm"></i></button>
-                                </td>
+                                        class="text-red-600 hover:text-red-800 p-1">
+                                        <i class="fas fa-trash text-sm"></i>
+                                    </button>
+                                </div>
+                            </td>
                             </tr>
                         @empty
                             <tr>
@@ -532,16 +553,13 @@
         });
 
         // Filter functions
-        function filterByPendapatan() {
-            alert('Menampilkan detail pendapatan dari penyewaan barang');
-        }
+        // Redirect laporan berdasarkan bulan & tahun
+        function goToLaporan(jenis) {
 
-        function filterByBiaya() {
-            alert('Menampilkan detail biaya operasional, promosi, dan inventaris');
-        }
+            const bulan = document.getElementById('bulanSelect').value;
+            const tahun = document.getElementById('tahunSelect').value;
 
-        function filterByLaba() {
-            alert('Menampilkan ringkasan laba bersih perusahaan');
+            window.location.href = `{{ url('keuangan') }}/${jenis}?bulan=${bulan}&tahun=${tahun}`;
         }
 
         // Sidebar Modal
@@ -643,7 +661,7 @@
         }
 
         function viewBiayaDetail(id) {
-            fetch(`/keuangan/${id}`).then(r => r.json()).then(r => {
+            fetch(`/keuangan/detail/${id}`).then(r => r.json()).then(r => {
                 if (r.success) {
                     const d = r.data;
                     document.getElementById('detailBiayaContent').innerHTML =

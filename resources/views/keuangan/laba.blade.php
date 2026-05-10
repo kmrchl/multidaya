@@ -1,34 +1,55 @@
 @extends('layouts.app')
 
-@section('title', 'Laba Bersih')
+@section('title', 'Laporan Laba Bersih')
 
 @section('main-content')
-<div class="p-6 max-w-3xl mx-auto">
-    <h1 class="text-2xl font-bold mb-6">Ringkasan Laba Bersih</h1>
+<div class="p-6 max-w-5xl mx-auto">
 
-    <div class="bg-white p-6 rounded-xl shadow space-y-4">
-        <div class="flex justify-between">
-            <span>Pendapatan</span>
-            <span class="text-green-600 font-semibold">
-                Rp {{ number_format($pendapatan,0,',','.') }}
-            </span>
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <h1 class="text-3xl font-bold text-slate-800">Laporan Laba Bersih</h1>
+            <p class="text-slate-500">
+                Bulan {{ $bulan }} Tahun {{ $tahun }}
+            </p>
         </div>
 
-        <div class="flex justify-between">
-            <span>Pengeluaran</span>
-            <span class="text-red-600 font-semibold">
-                Rp {{ number_format($pengeluaran,0,',','.') }}
-            </span>
+        <a href="{{ route('keuangan.index', ['bulan' => $bulan, 'tahun' => $tahun]) }}"
+           class="bg-slate-700 text-white px-4 py-2 rounded-xl">
+            Kembali
+        </a>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+        <div class="bg-white rounded-3xl border shadow-sm p-6">
+            <h3 class="text-sm font-bold text-slate-500 uppercase mb-2">
+                Pendapatan
+            </h3>
+
+            <p class="text-3xl font-black text-green-600">
+                Rp {{ number_format($pendapatan, 0, ',', '.') }}
+            </p>
         </div>
 
-        <hr>
+        <div class="bg-white rounded-3xl border shadow-sm p-6">
+            <h3 class="text-sm font-bold text-slate-500 uppercase mb-2">
+                Pengeluaran
+            </h3>
 
-        <div class="flex justify-between text-lg font-bold">
-            <span>Laba Bersih</span>
-            <span class="text-blue-600">
-                Rp {{ number_format($laba,0,',','.') }}
-            </span>
+            <p class="text-3xl font-black text-red-600">
+                Rp {{ number_format($pengeluaran, 0, ',', '.') }}
+            </p>
         </div>
+
+        <div class="bg-white rounded-3xl border shadow-sm p-6">
+            <h3 class="text-sm font-bold text-slate-500 uppercase mb-2">
+                Laba Bersih
+            </h3>
+
+            <p class="text-3xl font-black text-blue-600">
+                Rp {{ number_format($laba, 0, ',', '.') }}
+            </p>
+        </div>
+
     </div>
 </div>
 @endsection

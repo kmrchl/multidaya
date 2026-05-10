@@ -12,17 +12,10 @@ class UserSeeder extends Seeder
     {
         // Hapus data tanpa truncate (agar foreign key tidak masalah)
         DB::table('users')->delete();
-<<<<<<< HEAD
-        
-        // Reset auto increment
-        DB::statement('ALTER TABLE users AUTO_INCREMENT = 1');
-        
-=======
 
         // Reset auto increment
         DB::statement('ALTER TABLE users AUTO_INCREMENT = 1');
 
->>>>>>> origin/main
         // Insert data user
         DB::table('users')->insert([
             [
@@ -47,19 +40,10 @@ class UserSeeder extends Seeder
                 'updated_at' => now(),
             ]
         ]);
-<<<<<<< HEAD
-        
-=======
-
->>>>>>> origin/main
         $this->command->info('✅ Users seeded successfully!');
         $this->command->info('Username: admin, staff, manager');
         $this->command->info('Password: password123');
     }
-<<<<<<< HEAD
-}
-=======
 
 
 }
->>>>>>> origin/main
