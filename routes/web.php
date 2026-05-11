@@ -1,20 +1,143 @@
 <?php
 
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PeminjamanController;
+use App\Http\Controllers\BarangController;
+use App\Http\Controllers\KeuanganController;
 use Illuminate\Support\Facades\Route;
 
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/test', function () {
+    return response()->json(['message' => 'OK']);
+});
+
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('dashboard');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
-
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+// Guest routes (tidak perlu login)
+Route::middleware(['guest'])->group(function () {
+    Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+    Route::post('/login', [LoginController::class, 'login']);
 });
 
-require __DIR__.'/auth.php';
+// Authenticated routes (memerlukan login)
+Route::middleware(['auth'])->group(function () {
+
+    // Dashboard
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+
+    // Profile Routes (dikomentari sementara)
+    // Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
+    // Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    // Route::get('/settings', [ProfileController::class, 'settings'])->name('settings');
+
+    // Support & Reports (static pages)
+    Route::view('/support', 'support.index')->name('support');
+    Route::view('/reports', 'reports.index')->name('reports.index');
+    Route::view('/messages', 'dashboard.index')->name('messages.index');
+    Route::view('/reports/revenue', 'dashboard.index')->name('reports.revenue');
+    Route::view('/activities', 'dashboard.index')->name('activities.index');
+    Route::view('/promo/create', 'dashboard.index')->name('promo.create');
+
+    // ==================== PEMINJAMAN ROUTES ====================
+    Route::prefix('peminjaman')->name('peminjaman.')->group(function () {
+        Route::get('/', [PeminjamanController::class, 'index'])->name('index');
+        Route::post('/', [PeminjamanController::class, 'store'])->name('store');
+        Route::get('/{id}', [PeminjamanController::class, 'show'])->name('show');
+        Route::put('/{id}', [PeminjamanController::class, 'update'])->name('update');
+        Route::put('/{id}/pengembalian', [PeminjamanController::class, 'pengembalian'])->name('pengembalian');
+        Route::post('/{id}/upload-bukti', [PeminjamanController::class, 'uploadBukti'])->name('upload-bukti');
+        Route::get('/{id}/invoice', [PeminjamanController::class, 'generateInvoice'])->name('invoice');
+        Route::delete('/{id}', [PeminjamanController::class, 'destroy'])->name('destroy');
+
+        // WhatsApp Notification Routes
+        Route::post('/{id}/send-pengiriman', [PeminjamanController::class, 'sendPengirimanNotification'])->name('send-pengiriman');
+        Route::post('/{id}/send-pengingat', [PeminjamanController::class, 'sendPengingatPengembalian'])->name('send-pengingat');
+    });
+
+
+        // Customer Check Routes (CEK PELANGGAN) - Letakkan di DALAM group
+        Route::post('/cek-pelanggan', [PeminjamanController::class, 'cekPelanggan'])->name('cek-pelanggan');
+        Route::get('/pelanggan-list', [PeminjamanController::class, 'getPelangganList'])->name('pelanggan-list');
+
+
+    // ==================== API ROUTES UNTUK CEK PELANGGAN (DI LUAR GROUP) ====================
+    // Atau pakai prefix api
+    Route::get('/api/pelanggan/list', [PeminjamanController::class, 'getPelangganList'])->name('api.pelanggan.list');
+    Route::post('/api/pelanggan/cek', [PeminjamanController::class, 'cekPelanggan'])->name('api.pelanggan.cek');
+
+    // ==================== BARANG ROUTES ====================
+    Route::prefix('barang')->name('barang.')->group(function () {
+        Route::get('/', [BarangController::class, 'index'])->name('index');
+        Route::get('/all', [BarangController::class, 'getAllData'])->name('all');
+        Route::get('/stats', [BarangController::class, 'getStats'])->name('stats');
+        Route::post('/', [BarangController::class, 'store'])->name('store');
+        Route::get('/{id}', [BarangController::class, 'show'])->name('show');
+        Route::put('/{id}', [BarangController::class, 'update'])->name('update');
+        Route::delete('/{id}', [BarangController::class, 'destroy'])->name('destroy');
+        Route::post('/{id}/stock', [BarangController::class, 'updateStock'])->name('update-stock');
+    });
+
+ // ==================== KEUANGAN ROUTES ====================
+
+    Route::prefix('keuangan')->name('keuangan.')->group(function () {
+
+        // Dashboard
+        Route::get('/', [KeuanganController::class, 'index'])->name('index');
+
+        // CRUD
+        Route::post('/', [KeuanganController::class, 'store'])->name('store');
+        Route::delete('/{id}', [KeuanganController::class, 'destroy'])->name('destroy');
+
+        // Detail laporan
+        Route::get('/pendapatan', [KeuanganController::class, 'pendapatan'])->name('pendapatan');
+        Route::get('/pengeluaran', [KeuanganController::class, 'pengeluaran'])->name('pengeluaran');
+        Route::get('/laba', [KeuanganController::class, 'laba'])->name('laba');
+
+        // AJAX
+        Route::get('/riwayat-json', [KeuanganController::class, 'getRiwayatByDate'])->name('riwayat.json');
+
+        // DETAIL BY ID
+        Route::get('/detail/{id}', [KeuanganController::class, 'show'])
+            ->whereNumber('id')
+            ->name('show');
+    });
+
+    // ==================== API ROUTES (untuk dropdown) ====================
+        Route::get('/{id}', [KeuanganController::class, 'show'])->name('show');
+        Route::get('/riwayat-json', [KeuanganController::class, 'getRiwayatByDate'])->name('riwayat.json');
+        Route::get('/export', [KeuanganController::class, 'export'])->name('export');
+        Route::get('/laporan-lab-rugi', [KeuanganController::class, 'laporanLabaRugi'])->name('laporan-lab-rugi');
+    
+
+    // ==================== API ROUTES ====================
+        Route::get('/api/barang-tersedia', function () {
+        return response()->json(
+            App\Models\Barang::where('status', 'aktif')
+                ->where('tersedia', '>', 0)
+                ->get(['id', 'kode_barang', 'nama_barang', 'harga_sewa', 'tersedia'])
+        );
+    })->name('api.barang.tersedia');
+
+    // ==================== DASHBOARD NOTIFICATIONS & RECOMMENDATIONS ====================
+    Route::post('/send-whatsapp', [DashboardController::class, 'sendWhatsAppNotification'])->name('send-whatsapp');
+    Route::get('/notifications', [DashboardController::class, 'getNotifications'])->name('notifications');
+    Route::post('/notifications/{id}/read', [DashboardController::class, 'markNotificationRead'])->name('notifications.read');
+    Route::post('/notifications/mark-all-read', [DashboardController::class, 'markAllRead'])->name('notifications.mark-all-read');
+    Route::get('/notifications/count', [DashboardController::class, 'getNotificationCount'])->name('notifications.count');
+    Route::get('/recommendations', [DashboardController::class, 'getRecommendations'])->name('recommendations');
+    Route::post('/recommendations/accept', [DashboardController::class, 'acceptRecommendation'])->name('recommendations.accept');
+    Route::get('/recommendations/refresh', [DashboardController::class, 'refreshRecommendations'])->name('recommendations.refresh');
+
+
+
+});
