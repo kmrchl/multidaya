@@ -13,6 +13,9 @@ use Illuminate\Support\Facades\Route;
 | Web Routes
 |--------------------------------------------------------------------------
 */
+
+require __DIR__.'/auth.php';
+
 Route::middleware('auth')->group(function () {
     Route::get('/test', function () {
         return response()->json(['message' => 'OK']);
