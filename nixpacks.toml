@@ -15,6 +15,3 @@ cmds = [
   "php artisan view:clear",
   "php artisan migrate --force"
 ]
-
-[start]
-cmd = "php -S 0.0.0.0:$PORT -t public"
